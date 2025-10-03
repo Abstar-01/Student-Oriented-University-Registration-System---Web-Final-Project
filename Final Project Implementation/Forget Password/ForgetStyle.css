@@ -1,0 +1,171 @@
+body{
+    background-color: #191919;
+}
+
+#EmailPanel h1{
+    margin-top: 150px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: -10px;
+}
+
+.FormPanel{
+    display: flex;
+    justify-content: center;
+}
+
+#EmailPanel p{
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+.EmailInputForm{
+    width: 30%;
+    background-color: #212322;
+    border-radius: 10px;
+    padding: 20px 20px 20px 20px;   
+}
+
+.EmailButton{
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    width: 300px;
+    outline: none;
+    color: #7C7C7C;
+}
+
+.EmailInputForm fieldset{
+    border-radius: 100px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.EmailContainer{
+    background-color: white;
+    border: 1px solid #7C7C7C;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.EmailContainer img{
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+}
+
+
+.SendButton{
+    margin-top: 10px;
+    padding: 10px 145px 10px 145px;
+    border: none;
+    border-radius: 5px;
+    background-color: #7C7C7C;
+    border: none;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.EmailInputForm a{
+    text-decoration: none;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+#OTP_Panel h1{
+    margin-top: 100px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: -10px;
+}
+
+#OTP_Panel p{
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    margin: 10px;
+}
+
+.OTPForm{
+    display: flex;
+    justify-content: center;
+}
+
+.OTP_Form{
+    width: 40%;
+    background-color: #212322;
+    border-radius: 10px;
+    padding: 20px 20px 20px 20px;   
+}
+
+.OTP_Form fieldset{
+    border-radius: 100px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.CodeContainer input{
+    width: 105px;
+    height: 105px;
+    border-radius: 5px;
+    border: none;
+    font-size: 50px;
+    text-align: center;
+    margin-right: 2px;
+}
+
+.SubmitButton{
+    margin-top: 10px;
+    padding: 10px 145px 10px 145px;
+    border: none;
+    border-radius: 5px;
+    background-color: #7C7C7C;
+    border: none;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.OTP_info{
+    
+}
+
+.OTP_Timer{
+    font-size: 30px;
+}
+
+#RestPanel h1{
+    margin-top: 150px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: -10px;
+}
+
+#RestPanel p{
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+.ResendOTP{
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #7C7C7C;
+}
+
+.RestPassword{
+    margin-bottom: 10px;
+}
+

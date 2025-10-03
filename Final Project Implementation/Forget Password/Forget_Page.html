@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forget Page</title>
+    <link rel="stylesheet" href="ForgetStyle.css">
+</head>
+<body>
+    <section id="EmailPanel" class="panel">
+        <h1>Forget password?</h1>
+        <p>Enter your details to receive a rest OTP code</p>
+        <div class="FormPanel">
+            <form class="EmailInputForm">
+                <fieldset>
+                    <form method="POST">
+                        <div class="EmailContainer">
+                            <img src="../Icons/At sign.png" alt="">
+                            <input type="email" class="EmailButton" placeholder="Your Email">
+                        </div>
+                        <div>
+                            <input type="button" value="Send" class="SendButton">
+                        </div>
+                    </form>
+                    <div>
+                        <a href="../Login/LoginPage.html">Back to Login</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+
+    <section id="OTP_Panel" class="panel">
+        <h1>Enter OTP Code</h1>
+        <p>Enter in your OTP Code to be able to rest your Email</p>
+        <div class="OTPForm">
+            <form class="OTP_Form" method="POST">
+                <fieldset>
+                    <div class="CodeContainer">
+                        <input type="text" inputmode="numeric" maxlength="1" class="otp-input">
+                        <input type="text" inputmode="numeric" maxlength="1" class="otp-input">
+                        <input type="text" inputmode="numeric" maxlength="1" class="otp-input">
+                        <input type="text" inputmode="numeric" maxlength="1" class="otp-input">
+                    </div>
+
+                    <div>
+                        <p class="OTP_info">Enter the OTP code you received in the boxes above.
+                            If the timer has finished and the OTP has expired,
+                            then click on the Resend OTP to request a new code.</p>
+                    </div>
+
+                    <div>
+                        <p><span class="OTP_Timer">60s</span></p>
+                        <a href="#" class="ResendOTP">Resend OTP Code</a>
+                    </div>
+
+                    <div><input type="button" value="Submit" class="SubmitButton"></div>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+
+    <section id="RestPanel" class="panel">
+        <h1>Enter In Your New Passwrod</h1>
+        <p>Enter your new password and confirmation password</p>
+        <div class="FormPanel">
+            <form class="EmailInputForm" method="POST">
+                <fieldset>
+                    <div class="RestPassword"><input type="password" class="EmailButton" placeholder="Your New Password">
+                    </div>
+                    <div class="ConfirmPassword"><input type="password" class="EmailButton"
+                            placeholder="Confirm Your Password"></div>
+                    <div><input type="button" value="Submit" class="SendButton"></div>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+
+    <script src="ForgetPage.js"></script>
+    <section></section>
+</body>
+</html>

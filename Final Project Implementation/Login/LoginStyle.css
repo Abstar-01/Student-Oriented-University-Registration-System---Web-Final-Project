@@ -1,0 +1,119 @@
+body{
+    background-image: url(../Images/Login\ Page\ Background\ Texture.png);
+}
+
+section.Login_Section{
+    margin-top: 100px;
+    display: flex;
+}
+
+.ImagesPanel{
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+.ImagesPanel img{
+    margin-top: -40px;
+    padding-left: 60px;
+}
+
+.FormPanel {
+    width: 50%;
+    /* background-color: red; */
+}
+
+.FormContainer{
+    padding-right: 100px;
+    height: 100%;
+}
+
+.LoginImageContainer{
+    display: flex;
+    justify-content: center;
+}
+
+.LoginImageContainer img{
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
+
+.UsernameContainer{
+    padding-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.UsernameContainer div{
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    padding: 7px;
+    align-items: center;
+}
+
+.UsernameContainer input{
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    width: 240px;
+    outline: none;
+    font-size: 17px;
+}
+
+.PasswordContainer{
+    padding-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.PasswordContainer div{
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    padding: 7px;
+    align-items: center;
+}
+
+.PasswordContainer input{
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    width: 240px;
+    outline: none;
+    font-size: 17px;
+}
+
+.ForgetPasswordContainer{
+    padding-top: 10px;
+    padding-left: 190px;
+    display: flex;
+    justify-content: center;
+}
+
+.ForgetPasswordContainer a{
+    text-decoration: none;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+.SubmitContainer{
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.SubmitContainer input{
+    border: none;
+    border-radius: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 40px;
+    padding-right: 40px;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    color: white;
+    background-color: #282825;
+}

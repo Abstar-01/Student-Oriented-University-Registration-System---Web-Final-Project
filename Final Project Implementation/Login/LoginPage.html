@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="LoginStyle.css">
+    <title>Login Page</title>
+</head>
+<body>
+    <section class="Login_Section">
+        <section class="ImagesPanel">
+            <img src="../Images/Login Side Image.png" width="80%">
+        </section>
+
+        <section class="FormPanel">
+            <div class="FormContainer">
+                <div class="LoginImageContainer">
+                    <img src="../Images/Login Logo.png" alt="" width="55%">
+                </div>
+
+                <form method="POST" id="loginForm">
+                    <div class="UsernameContainer">
+                        <div>
+                            <img src="../Icons/User.png" alt="" width="30px" height="30px">
+                            <input type="text" name="username" placeholder="Username" required>
+                        </div>
+                    </div>
+
+                    <div class="PasswordContainer">
+                        <div>
+                            <img src="../Icons/Lock.png" alt="" width="30px" height="30px">
+                            <input type="password" name="password" placeholder="Password" required>
+                        </div>
+                    </div>
+
+                    <div class="ForgetPasswordContainer">
+                        <a href="../Forget Password/Forget_Page.html">forget password?</a>
+                    </div>
+
+                    <div class="SubmitContainer">
+                        <input type="submit" value="Submit">
+                    </div>
+                </form>
+        </section>
+    </section>
+
+</body>
+<script src="LoginScript.js" defer></script>
+</html>

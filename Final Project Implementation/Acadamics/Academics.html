@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="AcademicsStyle.css">
+</head>
+
+<body>
+    <nav class="Navigation">
+        <img src="../Images/Hilcoe Logo N.png" alt="" width="7%">
+        <a href="../Home Page/Home.html">Home</a>
+        <a href="">Academics</a>
+        <a href="../Registration/Registration.html">Registration</a>
+        <ul class="Menu">
+            <li type="none">
+                <p>Assistance</p>
+                <ul class="subMenu" type="none">
+                    <li><a href="../Help and Feedback/Help.html">Help</a></li>
+                    <li><a href="../Help and Feedback/Feedback.html">Feedback</a></li>
+                </ul>
+            </li>
+        </ul>
+        <button>Logout</button>
+    </nav>
+    <section class="AcademicsContent">
+        <section class="CourseInformationPanel">
+            <div class="CourseSearchInfo">
+                <div class="BlackCover">
+                    <div class="ProfileButton"><img src="../Icons/Test Account.png" alt="" width="50px" height="50px">
+                    </div>
+                    <h1>Course Listing Dashboard</h1>
+                    <div class="SearchBar">
+                        <div class="SearchDesign">
+                            <input type="search" name="" id="SeachBarInput" placeholder="Search">
+                            <img src="../Icons/Search.png" alt="" width="40px" height="40px">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="CourseSearchContent">
+                <div class="CoursePanelTemp">
+                    <img src="Course Code Images/Course Background.jpg" alt="" width="100%" height="100%" class="CourseCodeIMG">
+                    <input type="text" value="Computer Network" class="CourseTitle">
+                    <input type="text" value="Credit Hour" class="CouseCreditHour">
+                    <input type="text" value="Course Type" class="CourseType">
+                    <textarea name="Description" id="" class="CourseDescription">This is the course Content</textarea>
+                </div>
+            </div>
+        </section>
+        <section class="StudentsPersonalInformation">
+            <div class="StudentInformation">
+                <form action="">
+                    <fieldset>
+                        <img src="../Icons/Back Arrow.png" alt="" width="50px" height="50px" ID="BackImage">
+                    </fieldset>
+                    <fieldset>
+                        <img src="../Icons/Profile.png" alt="" width="100%" height="100%">
+                        <input type="text" readonly>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Student ID</legend>
+                        <input type="text" readonly>
+                    </fieldset>
+                    <fieldset>
+                        <legend>CGPA</legend>
+                        <input type="text" readonly>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Batch</legend>
+                        <input type="text" readonly>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Phone Number</legend>
+                        <input type="text" readonly>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Program</legend>
+                        <input type="text" readonly>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Academics Year</legend>
+                        <input type="text" readonly>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="CourseTakenContent">
+                
+            </div>
+        </section>
+    </section>
+</body>
+<script src="AcademicsScript.js"></script>
+
+</html>

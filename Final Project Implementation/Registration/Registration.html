@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Registration.css">
+    <title>Registration</title>
+</head>
+
+<body>
+    <nav class="Navigation">
+        <img src="../Images/Hilcoe Logo N.png" alt="" width="7%">
+        <a href="../Home Page/Home.html">Home</a>
+        <a href="../Acadamics/Academics.html">Academics</a>
+        <a href="">Registration</a>
+        <ul class="Menu">
+            <li type="none">
+                <p>Assistance</p>
+                <ul class="subMenu" type="none">
+                    <li><a href="../Help and Feedback/Help.html">Help</a></li>
+                    <li><a href="../Help and Feedback/Feedback.html">Feedback</a></li>
+                </ul>
+            </li>
+        </ul>
+        <button>Logout</button>
+    </nav>
+
+    <section class="container">
+        <nav class="NavigationBar">
+            <button class="icon" id="RegisterIcon">
+                <img src="../Icons/Task.png" alt="">
+            </button>
+            <hr style="height: 85px;">
+            <button class="icon" id="AddIcon">
+                <img src="../Icons/Add New.png">
+            </button>
+            <hr style="height: 85px;">
+            <button class="icon" id="DropIcon">
+                <img src="../Icons/Info Squared.png">
+            </button>
+        </nav>
+
+        <section class="Content">
+            <section class="BaseDisplay">
+                <p>This is the Base Page</p>
+            </section>
+            <section class="RegisterationPanel">
+                <section class="RegTitle">
+                    <img src="../Icons/Hand-Clear.png" alt="" width="50px" height="50px">
+                    <h1 class="RegTitleH1"><u>Registration</u></h1>
+                    <div>
+                        <img src="../Icons/WhiteFilledCircle.png" class="Check" width="30px" height="30px">
+                        <hr style="width: 100px; height: 1px; background-color: white;">
+                        <img src="../Icons/WhiteCircle.png" class="Check" width="30px" height="30px">
+                        <hr style="width: 100px; height: 1px; background-color: white;">
+                        <img src="../Icons/WhiteCircle.png" class="Check" width="30px" height="30px">
+                    </div>
+                </section>
+                <p class="RegParagraph">
+                    Register for the semester, select your courses, and pay your fees securely.
+                    Once payment is complete, you’ll get a receipt you can download or print.
+                </p>
+                <section class="Selection">
+                    <h2>Course Selection</h2>
+                    <hr>
+                    <table border="" cellspacing="5px" cellpadding="10px" class="CourseContent">
+                        <tr class="Header">
+                            <td class="CheckBox">
+                                <input type="checkbox" class="CB">
+                            </td>
+                            <td class="CourseID">Course Code</td>
+                            <td class="CourseTitle">Course Title</td>
+                            <td class="CreditHour">Credit Hour</td>
+                            <td class="CourseFee">Payment Fee</td>
+                        </tr>
+                        <tr>
+                            <td class="CheckBox">
+                                <input type="checkbox" class="CB">
+                            </td>
+                            <td class="CourseID"></td>
+                            <td class="CourseTitle"></td>
+                            <td class="CreditHour"></td>
+                            <td class="CourseFee"></td>
+                        </tr>
+                        <tr>
+                            <td class="CheckBox">
+                                <input type="checkbox" class="CB">
+                            </td>
+                            <td class="CourseID"></td>
+                            <td class="CourseTitle"></td>
+                            <td class="CreditHour"></td>
+                            <td class="CourseFee"></td>
+                        </tr>
+                        <tr>
+                            <td class="CheckBox">
+                                <input type="checkbox" class="CB">
+                            </td>
+                            <td class="CourseID"></td>
+                            <td class="CourseTitle"></td>
+                            <td class="CreditHour"></td>
+                            <td class="CourseFee"></td>
+                        </tr>
+                        <tr>
+                            <td class="CheckBox">
+                                <input type="checkbox" class="CB">
+                            </td>
+                            <td class="CourseID"></td>
+                            <td class="CourseTitle"></td>
+                            <td class="CreditHour"></td>
+                            <td class="CourseFee"></td>
+                        </tr>
+                    </table>
+                    <button type="submit" value="Submit" class="SubmitButton">Submit</button>
+                </section>
+                <section class="Payment">
+                    <h2>Course Payment</h2>
+                    <hr>
+                    <form id="PaymentInputForm" action="">
+                        <div>
+                            <fieldset>
+                                <legend>Account Number</legend>
+                                <input type="text" id="AccountNumber" class="PaymentInputInformation">
+                            </fieldset>
+                        </div>
+                        <div>
+                            <fieldset>
+                                <legend>Bank</legend>
+                                <select name="" id="BankName" class="PaymentInputInformation">
+                                    <option value=" " default hidden></option>
+                                    <option value="CBE">Commercial Bank of Ethiopia (CBE) </option>
+                                    <option value="Awash Bank">Awash Bank</option>
+                                    <option value="Dashen Bank">Dashen Bank</option>
+                                    <option value="Bank of Abyssinia">Bank of Abyssinia</option>
+                                    <option value="Wegagen Bank">Wegagen Bank</option>
+                                    <option value="Hibret Bank">Hibret Bank</option>
+                                    <option value="Nib International Bank">Nib International Bank</option>
+                                    <option value="Zemen Bank">Zemen Bank</option>
+                                    <option value="Amhara Bank">Amhara Bank</option>
+                                    <option value="Bunna Bank">Bunna Bank</option>
+                                    <option value="Berhan Bank">Berhan Bank</option>
+                                    <option value="Abay Bank">Abay Bank</option>
+                                    <option value="ZamZam Bank">ZamZam Bank</option>
+                                    <option value="Ahadu Bank">Ahadu Bank</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="fileInputBackground">
+                            <label for="fileUpload" class="Proof">
+                                <img src="../Icons/Upload File 2.png" alt="Click to upload"
+                                    style="width: 100px; height: 100px; cursor: pointer;" />
+                                <p>Upload Reciet</p>
+                            </label>
+                            <input type="file" id="fileUpload" style="display: none;" class="PaymentInputInformation">
+                        </div>
+                        <div>
+                            <fieldset>
+                                <legend>Transaction ID</legend>
+                                <input type="text" id="TransactionID" class="PaymentInputInformation">
+                            </fieldset>
+                        </div>
+                        <div>
+                            <fieldset>
+                                <legend>Total Amount</legend>
+                                <input type="text" id="TotalAmount" class="PaymentInputInformation" value="------" readonly>
+                            </fieldset>
+                        </div>
+                        <div>
+                            <fieldset>
+                                <legend>Additional Information</legend>
+                                <textarea name="" id="AdditionalInformation" class="PaymentInputInformation"></textarea>
+                            </fieldset>
+                        </div>
+                        <div>
+                            <input type="button" name="Back" value="Back" class="SendingBack">
+                            <input type="button" name="Submit" value="Submit" class="SubmittingPayment">
+                        </div>
+                    </form>
+                </section>
+                <section class="FinaceReciet">
+                    <hr>
+                    <section class="FinaceRecietContent">
+                        <div class="StudentInformation">
+                            <form action="">
+                                <fieldset>
+                                    <legend>Student Information</legend>
+                                    <fieldset>
+                                        <legend>Full Name: </legend>
+                                        <input type="text" value="Abel Belayneh Girma" readonly>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Studen ID</legend>
+                                        <input type="text" value="AK8225" readonly>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Program</legend>
+                                        <input type="text" value="Computer Science" readonly>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Batch</legend>
+                                        <input type="text" placeholder="DRB2302" readonly>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Contact Information</legend>
+                                        <input type="text" placeholder="+251978490566" readonly>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Year of Enrolment</legend>
+                                        <input type="text" placeholder="2025" readonly>
+                                    </fieldset>
+                                </fieldset>
+                            </form>
+
+                        </div>
+                        <div class="CoursesTaken">
+                            <form action="">
+                                <fieldset>
+                                    <legend>Course Information</legend>
+                                    <table>
+                                        <tr></tr>
+                                            <tr>
+                                                <td>Total Amount</td>
+                                                <td>XXXX.XX</td>
+                                            </tr>
+                                    </table>
+                                </fieldset>
+                            </form>
+                        </div>
+                        <div class="TransactionInformation">
+                            <form action="">
+                                <fieldset>
+                                    <legend>Transaction Information</legend>
+                                    <table cellspacing="5px" width="100%">
+                                        <tr>
+                                            <td><u>Registration Reciet ID</u>: <label class="RRID">dslddncknfkne</label></td>
+                                            <td><u>Transaction ID</u>: <label class="TID">RF231X3201231WD</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td><u>Account Number</u>: <label class="A_Number">1000023456789</label></td>
+                                            <td><u>Bank</u>: <label class="BankName">Commercial Bank of Ethiopia</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td><u>Amount Payed</u>: <label class="AmPayed"></label></td>
+                                            <td rowspan="2" class="DownloadRecite">
+                                                <div class="DownloadContent">
+                                                    <img src="../Icons/Download.png" alt="" width="30px" height="30px"><label for="">Download Reciet</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><u>Date of Payment</u>: <label class="DAP"></label></td>
+                                        </tr>
+                                    </table>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </section>
+                </section>
+            </section>
+            <section class="AddPanel">
+                <p>This is the Add Course Panel</p>
+            </section>
+            <section class="AccountInfo">
+                <div class="AccountInfoHeader">
+                    <img src="../Icons/Banking Logos/Bank.png" alt="" width="50px" height="50px">
+                    <h1>Bank Acount Detials</h1>
+                </div>
+                <hr>
+                <section class="AccountContent">
+                    <!-- Page One of Account information-->
+                    <div class="AccountInfoPageOne">
+                        <div>
+                            <img src="../Icons/Banking Logos/CBE-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Commercial Bank of Ethiopia</u><br> acc: 1000023456789</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Awash Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Awash Bank</u><br> acc: 0111122233344</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Dashen Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Dashen Bank</u><br> acc: 3000456789123</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Bank of Abyssinia-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Bank of Abyssinia</u><br> acc: 4000567891234</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Wegagen Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Wegagen Bank</u><br> acc: 5000678912345</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Hibret Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Hibret Bank</u><br> acc: 6000789123456</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Nib International-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Nib International Bank</u><br> acc: 7000891234567</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Zemen Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Zemen Bank</u><br> acc: 8000902345678</p>
+                        </div>
+                        <button class="AccountInfoNextPage">Next</button>
+                    </div>
+
+                    <!-- Page Two of Account information-->
+                    <div class="AccountInfoPageTwo">
+                        <div>
+                            <img src="../Icons/Banking Logos/Amhara Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Amhara Bank</u><br> acc: 9000123456789</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Bunn Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Bunna Bank</u><br> acc: 00550647015300</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Brehan Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Berhan Bank</u><br> acc: 1100112233445</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Abay Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Abay Bank</u><br> acc: 1200223344556</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/ZamZam Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>ZamZam Bank</u><br> acc: 1300334455667</p>
+                        </div>
+                        <div>
+                            <img src="../Icons/Banking Logos/Ahadu Bank-icon.png" alt="" width="60px" height="60px">
+                            <hr
+                                style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
+                            <p><u>Ahadu Bank</u><br> acc: 1400445566778</p>
+                        </div>
+                        <button class="AccountInfoBackPage">Back</button>
+                    </div>
+                </section>
+            </section>
+        </section>
+    </section>
+
+    <footer>
+        <p>© 2025 HiLcoE School of Computer Science and Technology. All Rights Reserved.</p>
+    </footer>
+</body>
+<script src="Registration_JS_Script.js"></script>
+
+</html>

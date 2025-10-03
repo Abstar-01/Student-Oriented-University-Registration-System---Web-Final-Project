@@ -246,10 +246,10 @@ nav a:hover {
     border-radius: 10px;
     display: grid !important;
     grid-template-columns: 0.3fr 1fr 0.2fr;
-    opacity: 1 !important;
+    opacity: 0; /* Start with opacity 0 */
     visibility: visible !important;
     margin-bottom: 20px;
-    transition: opacity 0.3s ease-in;
+    transition: opacity 1s ease-in-out; /* 1 second fade transition */
     overflow: hidden;
     box-sizing: border-box;
 }
@@ -293,10 +293,11 @@ nav a:hover {
 /* Show cloned course panels */
 .course-panel {
     display: grid !important;
-    opacity: 1 !important;
-    height: 400px !important;
+    opacity: 1 !important; /* This will be overridden by inline style initially */
+    height: 125px !important;
     margin-bottom: 20px !important;
     visibility: visible !important;
+    transition: opacity 1s ease-in-out; /* Ensure transition is applied */
 }
 
 /* Ensure all form elements are visible in cloned panels */
@@ -312,7 +313,7 @@ nav a:hover {
     display: flex !important;
     flex-direction: column;
     overflow-y: auto;
-    transition: height 0.5s ease-in-out;
+    transition: height 1s ease-in-out;
 }
 
 .CourseInformationPanel.resized {

@@ -15,16 +15,25 @@ if (!isset($_SESSION['batch'])) {
 $batch = $_SESSION['batch'];
 
 try {
-    // Call stored procedure
-    $stmt = $conn->prepare("CALL GetCourseListForBatch(?)");
+    // Call stored procedure GetCourseListByBatch
+    $stmt = $conn->prepare("CALL GetCourseListByBatch(?)");
     $stmt->bind_param("s", $batch);
     $stmt->execute();
     $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    
+    $courseCodes = [];
+    
+    // Fetch all course codes from the result set
+    while ($row = $result->fetch_assoc()) {
+        if (isset($row['course_name']) && !empty(trim($row['course_name']))) {
+            $courseCodes[] = trim($row['course_name']);
+        }
+    }
+    
     $stmt->close();
-
-    // If no course offering
-    if (!$row || (isset($row['Message']) && $row['Message'] === 'Courses Not Being Offered')) {
+    
+    // If no courses found
+    if (empty($courseCodes)) {
         echo json_encode([
             'success' => false,
             'message' => 'Courses Not Being Offered'
@@ -32,24 +41,29 @@ try {
         exit;
     }
 
-    // Process course list
-    $courseCodes = explode(" ", trim($row['CourseList']));
+    // Get course details for each course code
     $courses = [];
-
-    $query = "SELECT CourseCode, CoursName AS CourseTitle, CreditHours, CourseFee 
-              FROM Course 
-              WHERE CourseCode = ?";
-    $stmt = $conn->prepare($query);
-
-    foreach ($courseCodes as $code) {
-        $stmt->bind_param("s", $code);
+    
+    if (!empty($courseCodes)) {
+        // Create placeholders for the IN clause
+        $placeholders = str_repeat('?,', count($courseCodes) - 1) . '?';
+        $query = "SELECT CourseCode, CoursName AS CourseTitle, CreditHours, CourseFee 
+                  FROM Course 
+                  WHERE CourseCode IN ($placeholders)";
+        
+        $stmt = $conn->prepare($query);
+        
+        // Bind parameters dynamically
+        $types = str_repeat('s', count($courseCodes));
+        $stmt->bind_param($types, ...$courseCodes);
         $stmt->execute();
-        $res = $stmt->get_result();
-        if ($course = $res->fetch_assoc()) {
+        $result = $stmt->get_result();
+        
+        while ($course = $result->fetch_assoc()) {
             $courses[] = $course;
         }
+        $stmt->close();
     }
-    $stmt->close();
 
     echo json_encode([
         'success' => true,

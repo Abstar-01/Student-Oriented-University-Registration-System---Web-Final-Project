@@ -43,6 +43,9 @@ try {
     if ($result2) {
         $row = $result2->fetch_assoc();
         $cgpa = round($row['CGPA'], 2); // round to 2 decimal places
+        
+        // STORE GPA IN SESSION
+        $_SESSION['gpa'] = $cgpa;
     }
     $stmt2->close();
     

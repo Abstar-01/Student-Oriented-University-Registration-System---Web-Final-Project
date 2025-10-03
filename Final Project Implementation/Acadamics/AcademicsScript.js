@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Calculate total height needed
-        const totalHeight = (3*(courseCount * (COURSE_PANEL_HEIGHT + PANEL_MARGIN) + (CONTENT_PADDING - PANEL_MARGIN)))/5 + 100;
+        const totalHeight = (3*(courseCount * (COURSE_PANEL_HEIGHT + PANEL_MARGIN) + (CONTENT_PADDING - PANEL_MARGIN)))/5 + 50;
         
         // Set the height in pixels
         courseSearchContent.style.height = totalHeight + 'px';
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const existingCourses = document.querySelectorAll('.course-panel');
             existingCourses.forEach(course => course.remove());
             currentCourseCount = 0;
-        }, 300);
+        }, 500);
         
         console.log('📉 Panels collapsed');
     };
@@ -153,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const newCourse = coursePanelTemp.cloneNode(true);
             newCourse.classList.add('course-panel');
             newCourse.removeAttribute('data-is-template'); // Remove template marker
-            newCourse.style.opacity = '0';
+            newCourse.style.opacity = '0'; // Start with opacity 0
+            newCourse.style.transition = 'opacity 1s ease-in-out'; // Add 1s transition
             newCourse.id = 'course-' + (course.CourseCode || index);
             
             // Populate with course data
@@ -181,11 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add to DOM
             courseSearchContent.appendChild(newCourse);
             
-            // Fade in effect
+            // Trigger fade in effect
             setTimeout(() => {
                 newCourse.style.opacity = '1';
-                newCourse.style.transition = 'opacity 0.3s ease-in';
-            }, 100);
+            }, 10); // Small timeout to ensure the transition works
 
             console.log('✅ Course tab created successfully!');
 
@@ -244,6 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             existingCourses.forEach(course => course.remove());
             currentCourseCount = 0;
             setDynamicHeight(0);
+            collapsePanels();
         }
     });
 

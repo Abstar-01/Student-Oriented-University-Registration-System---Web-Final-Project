@@ -1,15 +1,12 @@
-// Get button elements
 var RegisterationTab = document.getElementById("RegisterIcon");
 var AddIcon = document.getElementById("AddIcon");
 var DropIcon = document.getElementById("DropIcon");
 
-// Get panel elements
 var panel1 = document.getElementsByClassName("BaseDisplay")[0];
 var panel2 = document.getElementsByClassName("RegisterationPanel")[0];
 var panel3 = document.getElementsByClassName("AddPanel")[0];
 var panel4 = document.getElementsByClassName("AccountInfo")[0];
 
-// Function to hide all panels
 function Clear() {
     panel1.style.display = "none";
     panel2.style.display = "none";
@@ -17,7 +14,6 @@ function Clear() {
     panel4.style.display = "none";
 }
 
-// Function to display the correct panel
 function display(event) {
     Clear();
     switch (event.currentTarget.id) {
@@ -35,7 +31,6 @@ function display(event) {
     }
 }
 
-// Attach click listeners
 RegisterationTab.addEventListener("click", display);
 AddIcon.addEventListener("click", display);
 DropIcon.addEventListener("click", display);
@@ -47,9 +42,8 @@ var MainSelector = document.getElementsByClassName("CB")[0];
 var checkboxes = document.getElementsByClassName("CB");
 var studentGPA = 0;
 var maxCreditHours = 0;
-var remainingCreditHours = 0; // ADDED: Track remaining credit hours
+var remainingCreditHours = 0;
 
-// Initialize GPA and credit hour limits
 fetch('StudentGPA.php')
     .then(response => response.json())
     .then(data => {
@@ -58,7 +52,6 @@ fetch('StudentGPA.php')
             setMaxCreditHours(studentGPA);
             console.log(`Student GPA: ${studentGPA}, Max Credit Hours: ${maxCreditHours}`);
             
-            // ADDED: Initialize checkbox restrictions after GPA is loaded
             initializeCheckboxRestrictions();
         } else {
             console.error('Failed to load GPA:', data.message);
@@ -70,7 +63,7 @@ fetch('StudentGPA.php')
         setMaxCreditHours(0);
     });
 
-// Function to set max credit hours based on GPA
+
 function setMaxCreditHours(gpa) {
     if (gpa >= 3.5) {
         maxCreditHours = 21;
@@ -83,10 +76,9 @@ function setMaxCreditHours(gpa) {
     } else {
         maxCreditHours = 10;
     }
-    remainingCreditHours = maxCreditHours; // ADDED: Initialize remaining hours
+    remainingCreditHours = maxCreditHours;
 }
 
-// Function to calculate current total credit hours
 function getCurrentCreditHours() {
     let totalHours = 0;
     for (let i = 1; i < checkboxes.length; i++) {
@@ -102,7 +94,7 @@ function getCurrentCreditHours() {
     return totalHours;
 }
 
-// Function to get credit hours for a specific checkbox
+
 function getCheckboxCreditHours(checkbox) {
     const row = checkbox.closest("tr");
     const creditHourCell = row.querySelector(".CreditHour");
@@ -110,7 +102,6 @@ function getCheckboxCreditHours(checkbox) {
     return isNaN(hours) ? 0 : hours;
 }
 
-// Function to check if selection exceeds credit hour limit
 function checkCreditHourLimit() {
     const currentHours = getCurrentCreditHours();
     
@@ -121,29 +112,24 @@ function checkCreditHourLimit() {
     return true;
 }
 
-// NEW: Function to check if a NEW selection would exceed limit
 function wouldExceedLimit(newHours) {
     const currentHours = getCurrentCreditHours();
     return (currentHours + newHours) > maxCreditHours;
 }
 
-// ADDED: Function to update remaining credit hours
 function updateRemainingCreditHours() {
     const currentHours = getCurrentCreditHours();
     remainingCreditHours = maxCreditHours - currentHours;
     return remainingCreditHours;
 }
 
-// ADDED: Function to check if course can be selected based on remaining credits
 function canSelectCourse(courseHours) {
     updateRemainingCreditHours();
-    
-    // If remaining credits are 2 or less, no courses can be selected
+
     if (remainingCreditHours <= 2) {
         return false;
     }
     
-    // Check if this specific course can fit in remaining credits
     if (courseHours > remainingCreditHours) {
         return false;
     }
@@ -151,14 +137,11 @@ function canSelectCourse(courseHours) {
     return true;
 }
 
-// ADDED: New function to handle individual checkbox changes with restriction check
 function handleCheckboxChange(event) {
     const checkbox = event.target;
     const courseHours = getCheckboxCreditHours(checkbox);
     
-    // Only check restrictions when checking a box (not unchecking)
     if (checkbox.checked) {
-        // First check if remaining credits allow any selection
         if (remainingCreditHours <= 2) {
             alert(`Cannot select any more courses! You only have ${remainingCreditHours} credit hours remaining, which is not enough for any course.`);
             checkbox.checked = false;
@@ -166,7 +149,6 @@ function handleCheckboxChange(event) {
             return;
         }
         
-        // Check if this specific course can be selected
         if (!canSelectCourse(courseHours)) {
             alert(`Cannot select this course! This course requires ${courseHours} credit hours, but you only have ${remainingCreditHours} credit hours remaining.`);
             checkbox.checked = false;
@@ -174,7 +156,6 @@ function handleCheckboxChange(event) {
             return;
         }
         
-        // Check if adding this course would exceed the overall limit
         if (wouldExceedLimit(courseHours)) {
             alert(`Cannot select this course! Adding ${courseHours} credit hours would exceed your maximum allowed ${maxCreditHours} credit hours.`);
             checkbox.checked = false;
@@ -183,22 +164,15 @@ function handleCheckboxChange(event) {
         }
     }
     
-    // Update remaining credit hours
+
     updateRemainingCreditHours();
-    
-    // Update the MainSelector state
     updateMainSelectorState();
-    
-    // Update total amount if function exists
     if (typeof updateTotal === 'function') {
         updateTotal();
     }
-    
-    // Update credit hour status
     updateCreditHourStatus();
 }
 
-// ADDED: Function to update main selector state
 function updateMainSelectorState() {
     var allChecked = true;
     for (var i = 1; i < checkboxes.length; i++) {
@@ -213,16 +187,13 @@ function updateMainSelectorState() {
 function ChooseAll() {
     const selectAll = MainSelector.checked;
     
-    // If we're SELECTING all courses (not deselecting)
     if (selectAll) {
-        // First, calculate what the total credit hours would be if we select all
         let potentialTotalHours = 0;
         for (let i = 1; i < checkboxes.length; i++) {
             const hours = getCheckboxCreditHours(checkboxes[i]);
             potentialTotalHours += hours;
         }
         
-        // Check if selecting all would exceed the limit
         if (potentialTotalHours > maxCreditHours) {
             alert(`Cannot select all courses! Total credit hours (${potentialTotalHours}) exceeds your maximum allowed (${maxCreditHours}) based on your GPA.`);
             MainSelector.checked = false;
@@ -230,75 +201,54 @@ function ChooseAll() {
         }
     }
     
-    // If we passed the check (or we're deselecting), proceed with selection
     for (var i = 1; i < checkboxes.length; i++) {
         checkboxes[i].checked = selectAll;
     }
-    
-    // Update remaining credit hours
     updateRemainingCreditHours();
-    
-    // Update total amount after selection
     if (typeof updateTotal === 'function') {
         updateTotal();
     }
-    
-    // Update credit hour status
     updateCreditHourStatus();
 }
 
-// ADDED: New function to initialize checkbox restrictions
 function initializeCheckboxRestrictions() {
-    // Remove existing event listeners first to avoid duplicates
     for (var i = 1; i < checkboxes.length; i++) {
         checkboxes[i].removeEventListener('change', handleCheckboxChange);
     }
-    
-    // Add new event listeners for individual checkboxes
     for (var i = 1; i < checkboxes.length; i++) {
         checkboxes[i].addEventListener('change', handleCheckboxChange);
     }
-    
-    // Update initial status
     updateCreditHourStatus();
 }
 
-// Function to display current credit hour status
 function displayCreditHourStatus() {
     const currentHours = getCurrentCreditHours();
     updateRemainingCreditHours();
     
     console.log(`Credit Hours: ${currentHours}/${maxCreditHours} (${remainingCreditHours} remaining)`);
     
-    // You can also display this information on the page
     const statusElement = document.getElementById('creditHourStatus');
     if (statusElement) {
         statusElement.textContent = `Credit Hours: ${currentHours}/${maxCreditHours} (${remainingCreditHours} remaining)`;
         statusElement.style.color = currentHours > maxCreditHours ? 'red' : 'green';
     }
     
-    // ADDED: Enhanced visual feedback for checkboxes
     for (let i = 1; i < checkboxes.length; i++) {
         const checkbox = checkboxes[i];
         const row = checkbox.closest("tr");
         const courseHours = getCheckboxCreditHours(checkbox);
         
         if (checkbox.checked) {
-            // Selected courses are always enabled
             checkbox.disabled = false;
             row.style.opacity = "1";
         } else {
-            // For unchecked courses, disable based on remaining credits
             if (remainingCreditHours <= 2) {
-                // No courses can be selected if remaining <= 2
                 checkbox.disabled = true;
                 row.style.opacity = "0.4";
             } else if (courseHours > remainingCreditHours) {
-                // Course requires more credits than available
                 checkbox.disabled = true;
                 row.style.opacity = "0.6";
             } else {
-                // Course can be selected
                 checkbox.disabled = false;
                 row.style.opacity = "1";
             }
@@ -306,23 +256,67 @@ function displayCreditHourStatus() {
     }
 }
 
-// Call this function whenever checkboxes change to update status
 function updateCreditHourStatus() {
     displayCreditHourStatus();
 }
-
-// Add global event listener for dynamic updates
 document.addEventListener('change', function(event) {
     if (event.target.classList.contains('CB')) {
         updateCreditHourStatus();
     }
 });
 
-// Initialize event listeners for main selector
 MainSelector.onclick = ChooseAll;
-
-// Initial status display (with delay to ensure GPA is loaded)
 setTimeout(updateCreditHourStatus, 1500);
+
+function loadStudentInformation() {
+    fetch('RetriveStudentInformation.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const studentInfo = data.data;
+                
+                const studentInputs = document.querySelectorAll('.StudentInformation input[type="text"]');
+                
+                if (studentInputs.length >= 6) {
+                    studentInputs[0].value = studentInfo.FullName || 'N/A';           // Full Name
+                    studentInputs[1].value = studentInfo.StudentID || 'N/A';          // Student ID
+                    studentInputs[2].value = studentInfo.Program || 'N/A';            // Program
+                    studentInputs[3].value = studentInfo.Batch || 'N/A';              // Batch
+                    studentInputs[4].value = studentInfo.PhoneNumber || 'N/A';        // Contact Information
+                    studentInputs[5].value = studentInfo.AcademicYear || 'N/A';       // Year of Enrolment
+                }
+                
+                console.log('Student information loaded successfully');
+            } else {
+                console.error('Failed to load student information:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching student information:', error);
+        });
+}
+
+const originalDisplay = display;
+function displayWithStudentInfo(event) {
+    originalDisplay(event);
+    if (event.currentTarget.id === "RegisterIcon") {
+        loadStudentInformation();
+    }
+}
+
+RegisterationTab.removeEventListener("click", display);
+RegisterationTab.addEventListener("click", displayWithStudentInfo);
+
+
+AddIcon.removeEventListener("click", display);
+AddIcon.addEventListener("click", displayWithStudentInfo);
+DropIcon.removeEventListener("click", display);
+DropIcon.addEventListener("click", displayWithStudentInfo);
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -333,9 +327,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const registrationPanel = document.querySelector(".RegisterationPanel");
     const courseTable = document.querySelector(".CourseContent");
 
-    // Duration of course registration in minutes
     const REGISTRATION_DURATION_MINUTES = 1;
-    let registrationTimer; // Store timer reference
+    let registrationTimer;
 
     registerIcon.addEventListener("click", () => {
         fetch("Registration.php")
@@ -347,20 +340,15 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(data => {
                 if (!data.success) {
-                    // Hide registration panel and alert user
                     registrationPanel.style.display = "none";
                     alert(data.message);
                     return;
                 }
 
-                // Show panel (in case it was hidden)
                 registrationPanel.style.display = "block";
-
-                // Clear existing course rows except header
                 const existingRows = courseTable.querySelectorAll("tr:not(.Header)");
                 existingRows.forEach(row => row.remove());
 
-                // Insert rows for each course with fade-in effect
                 data.data.forEach((course, index) => {
                     const row = document.createElement("tr");
                     row.style.opacity = "0";
@@ -376,13 +364,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     courseTable.appendChild(row);
                     
-                    // Staggered fade-in effect
                     setTimeout(() => {
                         row.style.opacity = "1";
                     }, index * 200);
                 });
 
-                // Start the registration timer
                 startRegistrationTimer(REGISTRATION_DURATION_MINUTES);
             })
             .catch(err => {
@@ -393,16 +379,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function startRegistrationTimer(minutes) {
-        let remainingTime = minutes * 60; // Convert minutes to seconds
+        let remainingTime = minutes * 60;
 
-        // Clear any existing timer
         if (registrationTimer) clearInterval(registrationTimer);
 
         registrationTimer = setInterval(() => {
             remainingTime--;
 
-            // Optional: Update a countdown display in the panel
-            // You can add a countdown display element in your HTML
             const countdownElement = document.getElementById("countdown");
             if (countdownElement) {
                 const minutesLeft = Math.floor(remainingTime / 60);
@@ -680,3 +663,4 @@ document.querySelector('.SubmittingPayment').addEventListener('click', function 
 
 });
 
+//////////////////////////////////////////////////////////////

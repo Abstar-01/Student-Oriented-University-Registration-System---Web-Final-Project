@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.success) {
                 // Show alert for testing
-                alert(`Login successful!\nUsername: ${data.username}\nPassword: ${data.password}`);
+                alert(`Login successful!\nUsername: ${data.username}\nPassword: ${data.password}\n GPA: ${data.gpa}`);
                 // Optional: redirect to home page
                 window.location.href = 'http://localhost:8000/Home%20Page/Home.html';
             } else {

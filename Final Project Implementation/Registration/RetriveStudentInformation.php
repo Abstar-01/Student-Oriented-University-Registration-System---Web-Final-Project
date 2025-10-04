@@ -14,7 +14,6 @@ if (!isset($_SESSION['studentid'])) {
 $studentid = $_SESSION['studentid'];
 
 try {
-    // Fetch student info
     $query = "
         SELECT 
             CONCAT(FirstName, ' ', MiddleName, ' ', LastName) AS FullName,
@@ -22,7 +21,8 @@ try {
             Batch,
             PhoneNumber,
             Program,
-            AcademicYear
+            AcademicYear,
+            Email
         FROM Student
         WHERE StudentID = ?
     ";
@@ -35,9 +35,6 @@ try {
     $stmt->close();
     
     if ($studentInfo) {
-        // Add CGPA from session to the student data array
-        $studentInfo['GPA'] = $_SESSION['gpa'] ?? "N/A";
-
         echo json_encode([
             'success' => true,
             'data' => $studentInfo

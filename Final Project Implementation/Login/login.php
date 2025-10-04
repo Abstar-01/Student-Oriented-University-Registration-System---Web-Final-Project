@@ -66,6 +66,19 @@ try {
         if ($studentRow) {
             $_SESSION['studentid'] = $studentRow['StudentID'];
             $_SESSION['batch'] = $studentRow['Batch'];
+            
+            // 🔹 CALCULATE AND STORE GPA IN SESSION (MOVED FROM ACADEMIE.PHP)
+            $cgpa = null;
+            $stmt3 = $conn->prepare("CALL CalculateGPA(?)");
+            $stmt3->bind_param("s", $studentRow['StudentID']);
+            $stmt3->execute();
+            $result3 = $stmt3->get_result();
+            if ($result3) {
+                $gpaRow = $result3->fetch_assoc();
+                $cgpa = round($gpaRow['CGPA'], 2); // round to 2 decimal places
+                $_SESSION['gpa'] = $cgpa;
+            }
+            $stmt3->close();
         }
 
         // Return JSON for JavaScript
@@ -74,6 +87,7 @@ try {
             'username'  => $row['Username'],
             'studentid' => $_SESSION['studentid'] ?? null,
             'batch'     => $_SESSION['batch'] ?? null,
+            'gpa'       => $_SESSION['gpa'] ?? null,
             'password'  => $password // ⚠ only for testing — remove in production
         ]);
     } else {

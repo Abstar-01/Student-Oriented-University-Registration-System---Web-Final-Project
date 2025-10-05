@@ -167,14 +167,63 @@ nav a:hover {
 }
 
 .BaseDisplay{
-  background-color: red;
-  height: 40vh;
-  display: none;
+  height: 98%;
+  /* display: none; */
 }
+
+.MainRegistrationTitle{
+  display: flex;
+  padding: 0;
+  margin: 0;
+  margin-top: 3%;
+  margin-bottom: -1%;
+  justify-content: center;
+  align-items: center;
+}
+
+.MainRegistrationTitle h1{
+  color: white;
+  font-size: 140px;
+  padding: 0;
+  margin: 0;
+}
+
+.BaseDisplay p {
+  color: white;
+  width: 95%;       
+  float: right;
+  line-height: 19px;
+  word-spacing: 2px;
+  text-align: justify;
+}
+
+.BaseExplanation{
+  margin-bottom: 11%;
+}
+
+.BaseDisplay p b{
+  font-size: 25px;
+}
+
+.IconExplanation{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.IconExplanation label{
+  margin-right: 4%;
+  font-size: 20px;
+  color: white;
+}
+
+
+
+/* Registration Panel */
 
 .RegisterationPanel{
   height: 72vh;
-  /* display: none; */
+  display: none;
 }
 
 .RegTitle{
@@ -312,6 +361,13 @@ input[type="checkbox"] {
   transform: scale(1.05);
   box-shadow: 0px 0px 4px rgba(238, 238, 238, 0.285);
 }
+
+
+.dimmed-row {
+    transition: opacity 0.3s ease, filter 0.3s ease;
+    background-color: rgba(200, 200, 200, 0.15);
+}
+
 
 /*///////////////////////////*/
 /*
@@ -667,7 +723,6 @@ input[type="checkbox"] {
 */
 
 .AddPanel{
-  background-color: purple;
   display: none;
 }
 

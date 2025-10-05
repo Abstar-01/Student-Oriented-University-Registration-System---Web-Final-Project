@@ -1,6 +1,8 @@
 CREATE DATABASE UniversityDatabse
 USE UniversityDatabse
 
+
+SELECT * from Student;
 CREATE TABLE Student (
     StudentID VARCHAR(10) PRIMARY KEY,
     FirstName VARCHAR(40),
@@ -15,28 +17,8 @@ CREATE TABLE Student (
     Email VARCHAR(40) UNIQUE
 );
 
-UPDATE Student
-SET Email = 'abgirma03@gmail.com'
-WHERE StudentID = 'AK8225';
 
-select * from Student;
--- Update Shewit to 2nd year
-
-INSERT INTO Student(StudentID, FirstName, MiddleName, LastName, DOB, Gender, Batch, Program, PhoneNumber, AcademicYear, Email) VALUES 
-('BZ1111','Tebarek', 'Awedenegest', 'Moges', '2000-04-16', 'Male', 'DRB2302A', 'Computer Science', '+251978490567', 3, 'abelbgworkmail@gmail.com'),
-('AK8225','Abel', 'Belayneh', 'Girma', '2003-12-11', 'Male', 'DRB2302A', 'Computer Science', '+251978490566', 3, 'abgirma03@gmail.com');
-
-INSERT INTO Student(StudentID, FirstName, MiddleName, LastName, DOB, Gender, Batch, Program, PhoneNumber, AcademicYear, Email) VALUES
-('TS9143','Tigist','Sisay','Abebe','2004-05-23','Female','DRB2402','Computer Science','+251911234567',2,'tigistsisay@gmail.com'),
-('MK7732','Mikiyas','Kebede','Tadesse','2002-09-15','Male','DRBSE2302','Software Engineering','+251922334455',3,'mikiyaskt@gmail.com'),
-('SH6351','Shewit','Hailu','Bekele','2003-01-07','Female','DRB2401','Computer Science','+251933445566',2,'shewithailu@gmail.com'),
-('DA8471','Daniel','Alemu','Mengistu','2001-11-19','Male','DRBSE2202','Software Engineering','+251944556677',4,'danielalemu@gmail.com'),
-('RN5024','Rahel','Negash','Worku','2004-03-29','Female','DRB2402','Computer Sciecne','+251955667788',2,'rahelnegash@gmail.com'),
-('KB1189','Kalkidan','Birhanu','Tesfaye','2003-07-13','Female','DRB2302','Computer Science','+251966778899',3,'kalkidanbt@gmail.com'),
-('YM7310','Yonas','Mulugeta','Gebre','2002-04-21','Male','DRBSE2201','Software Engineering','+251977889900',4,'yonasmulugeta@gmail.com'),
-('SL2246','Selam','Lulseged','Haile','2003-10-05','Female','DRBSE2401','Software Engineering','+251988990011',2,'selamlh@gmail.com'),
-('HB9920','Henok','Bekele','Fikremariam','2001-06-30','Male','DRB2202','Computer Science','+251999001122',4,'henokbf@gmail.com');
-
+Select * From Login;
 CREATE TABLE Login(
 	StudentID VARCHAR(10) UNIQUE,
     Username VARCHAR(20) PRIMARY KEY,
@@ -45,34 +27,41 @@ CREATE TABLE Login(
 	FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
 
-Select * From Login;
 
 SELECT * FROM Course;
-
 CREATE TABLE Course(
 	CourseCode VARCHAR(10) PRIMARY KEY,
     CoursName VARCHAR(100),
     CreditHours INT,
     CourseDescription TEXT,
+    Prerequisite VARCHAR(30),
     CourseFee FLOAT
 );
 
+
+SELECT * FROM CourseOffered;
 CREATE TABLE CourseOffered(
     Batch VARCHAR(10) PRIMARY KEY,
     CourseList VARCHAR(255)
 );
 
-Select * From CourseOffered;
 
+Select * From CourseTaken;
 CREATE TABLE CourseTaken(
 	StudentID VARCHAR(10),
     CourseCode VARCHAR(10),
     Grade FLOAT,
+    Status VARCHAR(10),
     FOREIGN KEY (CourseCode) REFERENCES Course(CourseCode),
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
 
+SELECT CourseCode FROM Course WHERE Prerequisite = 'CS322';
+INSERT INTO CourseTaken(StudentID, CourseCode, Status) VALUES
+('AK8225', 'CS322','Fail');
 
+
+SELECT * FROM Feedback;
 CREATE TABLE Feedback (
     FeedbackID INT PRIMARY KEY AUTO_INCREMENT,
     StudentID VARCHAR(10),
@@ -81,24 +70,27 @@ CREATE TABLE Feedback (
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
 
+DROP TABLE Registration;
+SELECT * FROM Registration;
 CREATE TABLE Registration(
-	RegistrationID INT PRIMARY KEY,
+	RegistrationID INT AUTO_INCREMENT PRIMARY KEY,
     StudentID VARCHAR(10),
-    CourseCode VARCHAR(10),
+    Courses VARCHAR(20),
     RegistrationDate DATE,
-    TransactionNumber FLOAT,
+    TransactionID VARCHAR(15),
+    TransactionAmount FLOAT,
+    BankName VARCHAR(100),
     TotalAmountOfCourse INT,
-    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
-    FOREIGN KEY (CourseCode) REFERENCES Course(CourseCode)
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
 
+
+SELECT * FROM OTP;
 CREATE TABLE OTP(
 	OTPCode VARCHAR(4) PRIMARY KEY,
     EDT DATE,
     status VARCHAR(15)
 );
-
-select * from OTP;
 
 
 /*
@@ -250,16 +242,76 @@ DROP PROCEDURE IF EXISTS GetCourseListByBatch;
 
 
 
+CALL CheckCoursePrerequisite('AK8225','CS323');
+-- Check Course Prerequisite 
+DELIMITER $$
+CREATE PROCEDURE CheckCoursePrerequisite(
+    IN p_StudentID VARCHAR(10),
+    IN p_CourseCode VARCHAR(20)
+)
+BEGIN
+    DECLARE v_Prerequisite VARCHAR(30);
+    DECLARE v_PrerequisiteName VARCHAR(100);
+    DECLARE v_CanTakeCourse BOOLEAN DEFAULT FALSE;
+    DECLARE v_Message VARCHAR(255);
+    
+    -- Get the prerequisite course for the selected course
+    SELECT Prerequisite, CoursName INTO v_Prerequisite, v_PrerequisiteName 
+    FROM Course WHERE CourseCode = p_CourseCode;
+    
+    IF v_Prerequisite IS NULL OR v_Prerequisite = '' OR v_Prerequisite = 'none' THEN
+        SET v_CanTakeCourse = TRUE;
+        SET v_Message = 'You can take this course. No prerequisite required.';
+    ELSE
+        SELECT COUNT(*) > 0 INTO v_CanTakeCourse
+        FROM CourseTaken WHERE StudentID = p_StudentID AND CourseCode = v_Prerequisite AND Status = 'Pass';
+        
+        IF v_CanTakeCourse THEN
+            SET v_Message = CONCAT('You can take this course. Prerequisite ', v_Prerequisite, ' completed successfully.');
+        ELSE
+            IF EXISTS (SELECT 1 FROM CourseTaken WHERE StudentID = p_StudentID AND CourseCode = v_Prerequisite AND Status = 'Fail') THEN
+                SET v_Message = CONCAT('You cannot take this course. You must PASS the prerequisite course: ', v_Prerequisite, ' first.');
+            ELSE
+                SET v_Message = CONCAT('You cannot take this course. You must complete the prerequisite: ', v_Prerequisite, ' first.');
+            END IF;
+        END IF;
+    END IF;
+    
+    SELECT 
+        v_CanTakeCourse AS can_take_course,
+        v_Message AS message,
+        v_Prerequisite AS prerequisite_course;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE CheckCoursePrerequisite;
+
+-- ---------------------------------------------------------------------
+--     ___________________________________________________________
+--    |  Insertion of Student Information into the Student Table  |
+--     ------------------------------------------------------------
+
+INSERT INTO Student(StudentID, FirstName, MiddleName, LastName, DOB, Gender, Batch, Program, PhoneNumber, AcademicYear, Email) VALUES 
+('BZ1111','Tebarek', 'Awedenegest', 'Moges', '2000-04-16', 'Male', 'DRB2302A', 'Computer Science', '+251978490567', 3, 'abelbgworkmail@gmail.com'),
+('AK8225','Abel', 'Belayneh', 'Girma', '2003-12-11', 'Male', 'DRB2302A', 'Computer Science', '+251978490566', 3, 'abgirma03@gmail.com');
+
+INSERT INTO Student(StudentID, FirstName, MiddleName, LastName, DOB, Gender, Batch, Program, PhoneNumber, AcademicYear, Email) VALUES
+('TS9143','Tigist','Sisay','Abebe','2004-05-23','Female','DRB2402','Computer Science','+251911234567',2,'tigistsisay@gmail.com'),
+('MK7732','Mikiyas','Kebede','Tadesse','2002-09-15','Male','DRBSE2302','Software Engineering','+251922334455',3,'mikiyaskt@gmail.com'),
+('SH6351','Shewit','Hailu','Bekele','2003-01-07','Female','DRB2401','Computer Science','+251933445566',2,'shewithailu@gmail.com'),
+('DA8471','Daniel','Alemu','Mengistu','2001-11-19','Male','DRBSE2202','Software Engineering','+251944556677',4,'danielalemu@gmail.com'),
+('RN5024','Rahel','Negash','Worku','2004-03-29','Female','DRB2402','Computer Sciecne','+251955667788',2,'rahelnegash@gmail.com'),
+('KB1189','Kalkidan','Birhanu','Tesfaye','2003-07-13','Female','DRB2302','Computer Science','+251966778899',3,'kalkidanbt@gmail.com'),
+('YM7310','Yonas','Mulugeta','Gebre','2002-04-21','Male','DRBSE2201','Software Engineering','+251977889900',4,'yonasmulugeta@gmail.com'),
+('SL2246','Selam','Lulseged','Haile','2003-10-05','Female','DRBSE2401','Software Engineering','+251988990011',2,'selamlh@gmail.com'),
+('HB9920','Henok','Bekele','Fikremariam','2001-06-30','Male','DRB2202','Computer Science','+251999001122',4,'henokbf@gmail.com');
 
 
-
-
+-- ----------------------------------------------------------------------------------
 --   _______________________________	
 --  |   Data Insertion Setion for   |
 --   -------------------------------
 
-
-SELECT * FROM CourseTaken;
 
 -- Abel Girma (AK8225) – 3rd Year, Computer Science (GPA = 3.39)
 INSERT INTO CourseTaken (StudentID, CourseCode, Grade) VALUES
@@ -272,7 +324,6 @@ INSERT INTO CourseTaken (StudentID, CourseCode, Grade) VALUES
 ('AK8225', 'CS341', 17.5),   -- B+ (3.5) × 5 credits
 ('AK8225', 'CS342', 15.0),   -- B (3.0) × 5 credits
 ('AK8225', 'CS343', 20.0);   -- A (4.0) × 5 credits
-
 
 -- ---------------------------------------------------------------------------------------
 -- Shewit Hailu (SH6351) – 2nd Year Computer Science (Low Performer: CGPA 2.21)

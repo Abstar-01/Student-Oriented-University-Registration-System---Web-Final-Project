@@ -327,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const registrationPanel = document.querySelector(".RegisterationPanel");
     const courseTable = document.querySelector(".CourseContent");
 
-    const REGISTRATION_DURATION_MINUTES = 1;
+    const REGISTRATION_DURATION_MINUTES = 5;
     let registrationTimer;
 
     registerIcon.addEventListener("click", () => {
@@ -565,46 +565,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/////////////////////////////////////////////////////////////////////////////
-//// Updating Total price input tag on payment page
-
-document.addEventListener("DOMContentLoaded", function () {
-  const totalAmountInput = document.getElementById("TotalAmount");
-
-  function updateTotal() {
-    let total = 0;
-    
-    // Get ALL checkboxes each time (including newly added ones)
-    const checkboxes = document.querySelectorAll(".CourseContent .CB");
-
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked) {
-        const row = checkbox.closest("tr");
-        const feeCell = row.querySelector(".CourseFee");
-        const fee = parseFloat(feeCell.textContent.trim());
-        if (!isNaN(fee)) {
-          total += fee;
-        }
-      }
-    });
-
-    totalAmountInput.value = total > 0 ? total.toLocaleString() + '.00' : "------";
-    totalAmountInput.style.color = '#555';
-  }
-
-  // Use event delegation to handle dynamically added checkboxes
-  document.addEventListener("change", function (event) {
-    if (event.target.classList.contains("CB")) {
-      updateTotal();
-    }
-  });
-
-  // Initial update in case any checkboxes are pre-checked
-  updateTotal();
-});
-
-
-
 ///////////////////////////////////////////////////////////////////
 // Course Transaction Value adding
 document.querySelector('.SubmitButton').addEventListener('click', function (e) {
@@ -663,4 +623,308 @@ document.querySelector('.SubmittingPayment').addEventListener('click', function 
 
 });
 
-//////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+ ////      Inserting the Registration Information Into Database Table    /////
+/////////////////////////////////////////////////////////////////////////////
+
+// Function to handle registration submission
+function submitRegistration() {
+    // Get form data
+    const transactionID = document.getElementById('TransactionID').value.trim();
+    const bankName = document.getElementById('BankName').value;
+    const totalAmount = document.getElementById('TotalAmount').value;
+    
+    // Get selected courses
+    const selectedCourses = getSelectedCourses();
+    
+    // Validation
+    if (!transactionID) {
+        alert('Please enter Transaction ID');
+        return;
+    }
+    if (!bankName || bankName === ' ') {
+        alert('Please select a bank');
+        return;
+    }
+    if (selectedCourses.length === 0) {
+        alert('Please select at least one course');
+        return;
+    }
+    if (totalAmount === '------' || totalAmount === 'XXXX.XX') {
+        alert('Invalid total amount');
+        return;
+    }
+    
+    const transactionAmount = parseFloat(totalAmount.replace(/[^\d.]/g, ''));
+    if (isNaN(transactionAmount) || transactionAmount <= 0) {
+        alert('Invalid transaction amount');
+        return;
+    }
+    
+    // Prepare data
+    const formData = new URLSearchParams();
+    formData.append('transaction_id', transactionID);
+    formData.append('transaction_amount', transactionAmount);
+    formData.append('bank_name', bankName);
+    selectedCourses.forEach(course => formData.append('selected_courses[]', course));
+    
+    // Show processing alert
+    alert('🔄 Processing your registration...');
+    
+    // Submit to server
+    fetch('PlacingRegistration.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`✅ Registration Successful!\n\nCourses Registered: ${data.courses_registered}\nTotal Courses: ${data.total_courses}`);
+            resetRegistrationForm();
+        } else {
+            alert('❌ Registration Failed: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('❌ Network Error: Please try again');
+    });
+}
+
+// Function to get selected course codes
+function getSelectedCourses() {
+    const checkboxes = document.getElementsByClassName("CB");
+    const selectedCourses = [];
+    
+    for (let i = 1; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            const row = checkboxes[i].closest("tr");
+            const courseCode = row.querySelector(".CourseID").textContent.trim();
+            selectedCourses.push(courseCode);
+        }
+    }
+    return selectedCourses;
+}
+
+// Function to reset form
+function resetRegistrationForm() {
+    document.getElementById('PaymentInputForm').reset();
+    document.getElementById('TotalAmount').value = '------';
+    
+    // Uncheck all course checkboxes
+    const checkboxes = document.getElementsByClassName("CB");
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+    }
+}
+
+// Initialize
+function initializeRegistrationSystem() {
+    const submitButton = document.querySelector('.SubmittingPayment');
+    if (submitButton) {
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            submitRegistration();
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initializeRegistrationSystem);
+
+
+///////////////////////////////////////////////////////////////////////
+////          Prerequisite Check for course selection              /////
+///////////////////////////////////////////////////////////////////////
+
+async function checkPrerequisites() {
+    const selectedCourses = getSelectedCourses();
+    
+    if (selectedCourses.length === 0) {
+        alert('Please select at least one course before submitting.');
+        return false;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('selected_courses', JSON.stringify(selectedCourses));
+        
+        const response = await fetch('AddRegistration.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status} error`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.has_prerequisite_issues) {
+                handlePrerequisiteIssues(data.results);
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            alert('Error checking prerequisites: ' + data.message);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Unable to check prerequisites. Please try again.');
+        return false;
+    }
+}
+
+function handlePrerequisiteIssues(prerequisiteResults) {
+    let alertMessage = "Prerequisite Issues Found:\n\n";
+    let coursesWithIssues = [];
+    let hasIssues = false;
+    
+    for (const [courseCode, result] of Object.entries(prerequisiteResults)) {
+        if (!result.can_take_course) {
+            alertMessage += `• ${courseCode}: ${result.message}\n\n`;
+            coursesWithIssues.push(courseCode);
+            hasIssues = true;
+        }
+    }
+    
+    if (hasIssues) {
+        alertMessage += "The courses with incomplete prerequisites have been dimmed and made inaccessible. Please review your selection.";
+        alert(alertMessage);
+        dimProblematicCourses(coursesWithIssues);
+    }
+}
+
+function dimProblematicCourses(coursesWithIssues) {
+    const checkboxes = document.getElementsByClassName("CB");
+    
+    for (let i = 1; i < checkboxes.length; i++) {
+        const checkbox = checkboxes[i];
+        const row = checkbox.closest("tr");
+        const courseCodeCell = row.querySelector(".CourseID");
+        const courseCode = courseCodeCell.textContent.trim();
+        
+        if (coursesWithIssues.includes(courseCode)) {
+            row.style.opacity = "0.1";
+            row.style.pointerEvents = "none";
+            checkbox.disabled = true;
+            checkbox.checked = false;
+        }
+    }
+
+    // After disabling invalid courses, recalculate totals
+    updateRemainingCreditHours?.();
+    updateTotal(); // now accessible
+    updateCreditHourStatus?.();
+}
+
+function getSelectedCourses() {
+    const checkboxes = document.getElementsByClassName("CB");
+    const selectedCourses = [];
+    
+    for (let i = 1; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked && !checkboxes[i].disabled) {
+            const row = checkboxes[i].closest("tr");
+            const courseCode = row.querySelector(".CourseID").textContent.trim();
+            if (courseCode) {
+                selectedCourses.push(courseCode);
+            }
+        }
+    }
+    return selectedCourses;
+}
+
+function resetCourseAppearance() {
+    const checkboxes = document.getElementsByClassName("CB");
+    
+    for (let i = 1; i < checkboxes.length; i++) {
+        const checkbox = checkboxes[i];
+        const row = checkbox.closest("tr");
+        row.style.opacity = "1";
+        row.style.pointerEvents = "auto";
+        checkbox.disabled = false;
+    }
+}
+
+async function SubmitSelection(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    const prerequisitesMet = await checkPrerequisites();
+    if (!prerequisitesMet) return false;
+    
+    const checkboxes = document.getElementsByClassName("CB");
+    let hasCheckedCourses = Array.from(checkboxes).some(cb => cb.checked && !cb.disabled);
+    
+    if (!hasCheckedCourses) {
+        alert('Please select at least one course.');
+        return false;
+    }
+
+    SelectionPage.style.transition = "opacity 0.5s";
+    SelectionPage.style.opacity = "0";
+
+    setTimeout(function () {
+        SelectionPage.style.display = "none";
+        PaymentPage.style.display = "block";
+        PaymentPage.style.opacity = "0";
+        PaymentPage.style.transition = "opacity 0.5s";
+        setTimeout(() => PaymentPage.style.opacity = "1", 50);
+    }, 500);
+
+    CheckCircles[0].src = "../Icons/GoCheckmark.png";
+    CheckCircles[1].src = "../Icons/WhiteFilledCircle.png";
+    
+    return true;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const registerIcon = document.getElementById("RegisterIcon");
+    if (registerIcon) registerIcon.addEventListener("click", () => setTimeout(resetCourseAppearance, 100));
+    
+    const SubmitButton = document.getElementsByClassName("SubmitButton")[0];
+    if (SubmitButton) SubmitButton.addEventListener('click', SubmitSelection);
+
+    // Initial total calculation
+    updateTotal();
+});
+
+///////////////////////////////////////////////////////////////////////
+////            Global function: Update Total Price               /////
+///////////////////////////////////////////////////////////////////////
+
+function updateTotal() {
+    const totalAmountInput = document.getElementById("TotalAmount");
+    if (!totalAmountInput) return;
+
+    let total = 0;
+    const checkboxes = document.querySelectorAll(".CourseContent .CB");
+
+    checkboxes.forEach((checkbox) => {
+        // Count only checked and enabled courses
+        if (checkbox.checked && !checkbox.disabled) {
+            const row = checkbox.closest("tr");
+            const feeCell = row.querySelector(".CourseFee");
+            const feeText = feeCell.textContent.trim();
+            const fee = parseFloat(feeText);
+            if (!isNaN(fee)) total += fee;
+        }
+    });
+
+    if (total > 0) {
+        totalAmountInput.value = total.toLocaleString() + '.00';
+        totalAmountInput.style.color = '#555';
+    } else {
+        totalAmountInput.value = "------";
+        totalAmountInput.style.color = '#555';
+    }
+}
+
+// Watch for changes to recalculate total dynamically
+document.addEventListener("change", function (event) {
+    if (event.target.classList.contains("CB")) {
+        updateTotal();
+    }
+});

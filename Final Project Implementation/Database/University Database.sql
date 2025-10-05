@@ -75,8 +75,9 @@ SELECT * FROM Registration;
 CREATE TABLE Registration(
 	RegistrationID INT AUTO_INCREMENT PRIMARY KEY,
     StudentID VARCHAR(10),
-    Courses VARCHAR(20),
+    Courses VARCHAR(40),
     RegistrationDate DATE,
+    BankAccountNumber VARCHAR(40),
     TransactionID VARCHAR(15),
     TransactionAmount FLOAT,
     BankName VARCHAR(100),

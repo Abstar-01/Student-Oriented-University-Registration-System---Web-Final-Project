@@ -629,21 +629,23 @@ document.querySelector('.SubmittingPayment').addEventListener('click', function 
 
 // Function to handle registration submission
 function submitRegistration() {
-    // Get form data
     const transactionID = document.getElementById('TransactionID').value.trim();
     const bankName = document.getElementById('BankName').value;
     const totalAmount = document.getElementById('TotalAmount').value;
+    const accountNumber = document.getElementById('AccountNumber').value.trim();
     
-    // Get selected courses
     const selectedCourses = getSelectedCourses();
-    
-    // Validation
+
     if (!transactionID) {
         alert('Please enter Transaction ID');
         return;
     }
     if (!bankName || bankName === ' ') {
         alert('Please select a bank');
+        return;
+    }
+    if (!accountNumber) {
+        alert('Please enter your bank account number');
         return;
     }
     if (selectedCourses.length === 0) {
@@ -654,24 +656,22 @@ function submitRegistration() {
         alert('Invalid total amount');
         return;
     }
-    
+
     const transactionAmount = parseFloat(totalAmount.replace(/[^\d.]/g, ''));
     if (isNaN(transactionAmount) || transactionAmount <= 0) {
         alert('Invalid transaction amount');
         return;
     }
-    
-    // Prepare data
+
     const formData = new URLSearchParams();
     formData.append('transaction_id', transactionID);
     formData.append('transaction_amount', transactionAmount);
     formData.append('bank_name', bankName);
+    formData.append('bank_account_number', accountNumber);
     selectedCourses.forEach(course => formData.append('selected_courses[]', course));
-    
-    // Show processing alert
+
     alert('🔄 Processing your registration...');
-    
-    // Submit to server
+
     fetch('PlacingRegistration.php', {
         method: 'POST',
         body: formData

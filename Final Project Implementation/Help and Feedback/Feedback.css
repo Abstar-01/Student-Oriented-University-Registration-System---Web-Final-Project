@@ -47,6 +47,16 @@ nav a:hover {
   font-weight: 500;
 }
 
+.Navigation button a{
+  color: white;
+  font-size: 30px;
+  transform: scale(1.01);
+}
+
+.Navigation button a:hover{
+  font-size: 30px;
+}
+
 .Menu{
     position: relative;
     padding: 0;

@@ -123,6 +123,16 @@ nav a:hover {
     transform: scale(1.05);
 }
 
+.Navigation button a{
+  color: white;
+  font-size: 30px;
+  transform: scale(1.01);
+}
+
+.Navigation button a:hover{
+  font-size: 30px;
+}
+
 .AcademicsContent {
     flex: 1;
     display: flex;

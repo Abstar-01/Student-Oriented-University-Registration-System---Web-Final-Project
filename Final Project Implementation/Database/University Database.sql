@@ -1,6 +1,15 @@
 CREATE DATABASE UniversityDatabse
 USE UniversityDatabse
 
+-- MYSQL Safe ON/OF CODE
+-- -------------------------------------------
+-- Disable safe updates for this session
+SET SQL_SAFE_UPDATES = 0;
+-- Perform the operation (be careful!)
+-- Re-enable safe updates
+SET SQL_SAFE_UPDATES = 1; 
+-- ---------------------------------------------
+
 
 SELECT * from Student;
 CREATE TABLE Student (
@@ -38,7 +47,6 @@ CREATE TABLE Course(
     CourseFee FLOAT
 );
 
-
 SELECT * FROM CourseOffered;
 CREATE TABLE CourseOffered(
     Batch VARCHAR(10) PRIMARY KEY,
@@ -55,6 +63,12 @@ CREATE TABLE CourseTaken(
     FOREIGN KEY (CourseCode) REFERENCES Course(CourseCode),
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
+
+Update CourseTaken
+SET Status = 'Failed'
+WHERE StudentID = 'AK8225' AND CourseCode = 'CS211';
+
+
 
 SELECT CourseCode FROM Course WHERE Prerequisite = 'CS322';
 INSERT INTO CourseTaken(StudentID, CourseCode, Status) VALUES
@@ -85,6 +99,13 @@ CREATE TABLE Registration(
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
 
+SELECT * FROM RegistrationStatus;
+CREATE TABLE RegistrationStatus (
+	StudentID VARCHAR(10) UNIQUE,
+    RegistrationID INT DEFAULT(0),
+	RegistrationStatus VARCHAR(15) DEFAULT('Not Registered'),
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+);
 
 SELECT * FROM OTP;
 CREATE TABLE OTP(
@@ -184,7 +205,7 @@ DELIMITER ;
 
 
 CALL CalculateGPA('AK8225');
-
+DROP PROCEDURE CalculateGPA;
 -- Calculating Comulatative GPA
 DELIMITER $$
 CREATE PROCEDURE CalculateGPA(
@@ -194,18 +215,18 @@ BEGIN
     DECLARE TotalCreditHours INT;
     DECLARE TotalGradePoints FLOAT;
 
-    IF EXISTS(SELECT 1 FROM CourseTaken WHERE StudentID = Student_ID) THEN
+    IF	 EXISTS(SELECT 1 FROM CourseTaken WHERE StudentID = Student_ID) THEN
 		-- Calculate total credit hours for the student
 		SELECT SUM(C.CreditHours) INTO TotalCreditHours
 		FROM Course AS C
 		JOIN CourseTaken AS CT ON C.CourseCode = CT.CourseCode
-		WHERE CT.StudentID = Student_ID;
+		WHERE CT.StudentID = Student_ID AND CT.Status = 'Passed';
 
 		-- Calculate total weighted grade points (Grade * CreditHour)
 		SELECT SUM(CT.Grade) INTO TotalGradePoints
 		FROM CourseTaken AS CT
 		JOIN Course AS C ON CT.CourseCode = C.CourseCode
-		WHERE CT.StudentID = Student_ID;
+		WHERE CT.StudentID = Student_ID AND CT.Status = 'Passed';
 
 		-- Return cumulative GPA
 		SELECT TotalGradePoints / TotalCreditHours AS CGPA;
@@ -286,6 +307,188 @@ END$$
 DELIMITER ;
 
 DROP PROCEDURE CheckCoursePrerequisite;
+
+
+-- Inserting Information Into the Registration
+DELIMITER $$
+CREATE PROCEDURE InsertRegistration(
+    IN p_StudentID VARCHAR(10),
+    IN p_Courses VARCHAR(40),
+    IN p_RegistrationDate DATE,
+    IN p_BankAccountNumber VARCHAR(40),
+    IN p_TransactionID VARCHAR(15),
+    IN p_TransactionAmount FLOAT,
+    IN p_BankName VARCHAR(100),
+    IN p_TotalAmountOfCourse INT,
+    OUT p_VerificationMessage VARCHAR(50)
+)
+BEGIN
+    -- Insert data into the Registration table
+    INSERT INTO Registration (StudentID, Courses, RegistrationDate, BankAccountNumber, TransactionID, TransactionAmount, BankName, TotalAmountOfCourse) 
+    VALUES (p_StudentID, p_Courses, p_RegistrationDate, p_BankAccountNumber, p_TransactionID, p_TransactionAmount, p_BankName, p_TotalAmountOfCourse);
+	
+    
+    -- Check if any row was affected
+    IF ROW_COUNT() > 0 THEN
+        SET p_VerificationMessage = 'Registration Successful';
+    ELSE
+        SET p_VerificationMessage = 'Registration Failed';
+    END IF;
+END $$
+DELIMITER ;
+
+
+
+call GetAvailableCoursesForStudent('AK8225');
+-- GetAvailable Course For Add Course
+DELIMITER $$
+CREATE PROCEDURE GetAvailableCoursesForStudent(
+    IN p_StudentID VARCHAR(10)
+)
+BEGIN
+    DECLARE student_batch VARCHAR(10);
+    DECLARE course_list TEXT;
+
+    -- Step 1: Get the student's batch
+    SELECT Batch INTO student_batch
+    FROM Student
+    WHERE StudentID = p_StudentID;
+
+    -- Step 2: Concatenate all CourseList values from other batches
+    SELECT GROUP_CONCAT(CourseList SEPARATOR ',') INTO course_list
+    FROM CourseOffered
+    WHERE Batch <> student_batch;
+
+    -- Step 3: Create first temporary table with all courses split
+    DROP TEMPORARY TABLE IF EXISTS TempCoursesStep1;
+    CREATE TEMPORARY TABLE TempCoursesStep1 (
+        CourseCode VARCHAR(10)
+    );
+
+    INSERT INTO TempCoursesStep1 (CourseCode)
+    SELECT DISTINCT TRIM(course)
+    FROM JSON_TABLE(
+        CONCAT('["', REPLACE(course_list, ',', '","'), '"]'),
+        "$[*]" COLUMNS (course VARCHAR(100) PATH "$")
+    ) AS t;
+
+    -- Step 4: Create a new temp table for courses NOT yet taken by the student
+    DROP TEMPORARY TABLE IF EXISTS TempCoursesStep2;
+    CREATE TEMPORARY TABLE TempCoursesStep2 AS
+    SELECT DISTINCT CourseCode
+    FROM TempCoursesStep1
+    WHERE CourseCode NOT IN (
+        SELECT CourseCode FROM CourseTaken WHERE StudentID = p_StudentID
+    );
+
+    -- Step 5: Select course details by joining with the Course table
+    SELECT c.CourseCode,
+           c.CoursName,
+           c.CreditHours,
+           c.CourseFee
+    FROM TempCoursesStep2 t
+    INNER JOIN Course c ON t.CourseCode = c.CourseCode Where c.CourseCode <> 'CS469';
+END$$
+DELIMITER ;
+
+
+
+call GetAvailableCoursesForStudent2('AK8225');
+-- Updated Get Available Courses For Student
+DELIMITER $$
+CREATE PROCEDURE GetAvailableCoursesForStudent2(
+    IN p_StudentID VARCHAR(10)
+)
+BEGIN
+    DECLARE student_batch VARCHAR(10);
+    DECLARE course_list TEXT;
+    DECLARE student_gpa FLOAT;
+
+    -- Step 1: Get the student's batch
+    SELECT Batch INTO student_batch
+    FROM Student
+    WHERE StudentID = p_StudentID;
+
+    -- Step 2: Calculate the student's GPA by calling CalculateGPA procedure
+    -- Create a temporary table to hold the GPA result
+    DROP TEMPORARY TABLE IF EXISTS TempGPA;
+    CREATE TEMPORARY TABLE TempGPA (CGPA FLOAT);
+
+    INSERT INTO TempGPA (CGPA)
+    SELECT TotalGradePoints / TotalCreditHours
+    FROM (
+        SELECT 
+            SUM(C.CreditHours) AS TotalCreditHours,
+            SUM(CT.Grade) AS TotalGradePoints
+        FROM Course AS C
+        JOIN CourseTaken AS CT ON C.CourseCode = CT.CourseCode
+        WHERE CT.StudentID = p_StudentID
+    ) AS GPAData;
+
+    SELECT COALESCE(CGPA, 0.00) INTO student_gpa FROM TempGPA;
+
+    -- Step 3: Concatenate all CourseList values from other batches
+    SELECT GROUP_CONCAT(CourseList SEPARATOR ',') INTO course_list
+    FROM CourseOffered
+    WHERE Batch <> student_batch;
+
+    -- Step 4: Create first temporary table with all offered courses split
+    DROP TEMPORARY TABLE IF EXISTS TempCoursesStep1;
+    CREATE TEMPORARY TABLE TempCoursesStep1 (
+        CourseCode VARCHAR(10)
+    );
+
+    INSERT INTO TempCoursesStep1 (CourseCode)
+    SELECT DISTINCT TRIM(course)
+    FROM JSON_TABLE(
+        CONCAT('["', REPLACE(course_list, ',', '","'), '"]'),
+        "$[*]" COLUMNS (course VARCHAR(100) PATH "$")
+    ) AS t;
+
+    -- Step 5: Create a filtered list of available courses based on GPA
+    DROP TEMPORARY TABLE IF EXISTS TempCoursesStep2;
+    CREATE TEMPORARY TABLE TempCoursesStep2 AS
+    SELECT DISTINCT t.CourseCode
+    FROM TempCoursesStep1 t
+    WHERE (
+        -- Case 1: High GPA (>= 3.5) - can take new courses except failed ones
+        (student_gpa >= 3.5 AND t.CourseCode NOT IN (
+            SELECT CourseCode FROM CourseTaken WHERE StudentID = p_StudentID AND Status = 'failed'
+        ))
+        OR
+        -- Case 2: Low GPA (< 3.5) - can only retake failed courses
+        (student_gpa < 3.5 AND t.CourseCode IN (
+            SELECT CourseCode FROM CourseTaken WHERE StudentID = p_StudentID AND Status = 'failed'
+        ))
+    );
+
+    -- Step 6: Return final course details
+    SELECT 
+        c.CourseCode,
+        c.CoursName,
+        c.CreditHours,
+        c.CourseFee,
+        student_gpa AS CurrentGPA
+    FROM TempCoursesStep2 t
+    INNER JOIN Course c ON t.CourseCode = c.CourseCode;
+
+END$$
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- ---------------------------------------------------------------------
 --     ___________________________________________________________

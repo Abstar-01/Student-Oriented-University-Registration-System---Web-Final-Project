@@ -24,7 +24,7 @@ function display(event) {
             panel3.style.display = "block";
             break;
         case "DropIcon":
-            panel4.style.display = "block";
+            panel4.style.display = "block";//change
             break;
         default:
             panel1.style.display = "block";
@@ -33,7 +33,7 @@ function display(event) {
 
 RegisterationTab.addEventListener("click", display);
 AddIcon.addEventListener("click", display);
-DropIcon.addEventListener("click", display);
+DropIcon.addEventListener("click", display);///change
 
 
 // Course Registration Selector
@@ -51,7 +51,7 @@ fetch('StudentGPA.php')
             studentGPA = parseFloat(data.gpa);
             setMaxCreditHours(studentGPA);
             console.log(`Student GPA: ${studentGPA}, Max Credit Hours: ${maxCreditHours}`);
-            
+
             initializeCheckboxRestrictions();
         } else {
             console.error('Failed to load GPA:', data.message);
@@ -104,7 +104,7 @@ function getCheckboxCreditHours(checkbox) {
 
 function checkCreditHourLimit() {
     const currentHours = getCurrentCreditHours();
-    
+
     if (currentHours > maxCreditHours) {
         alert(`Credit hour limit exceeded! You are allowed maximum ${maxCreditHours} credit hours. Currently selected: ${currentHours} hours.`);
         return false;
@@ -129,18 +129,18 @@ function canSelectCourse(courseHours) {
     if (remainingCreditHours <= 2) {
         return false;
     }
-    
+
     if (courseHours > remainingCreditHours) {
         return false;
     }
-    
+
     return true;
 }
 
 function handleCheckboxChange(event) {
     const checkbox = event.target;
     const courseHours = getCheckboxCreditHours(checkbox);
-    
+
     if (checkbox.checked) {
         if (remainingCreditHours <= 2) {
             alert(`Cannot select any more courses! You only have ${remainingCreditHours} credit hours remaining, which is not enough for any course.`);
@@ -148,14 +148,14 @@ function handleCheckboxChange(event) {
             event.preventDefault();
             return;
         }
-        
+
         if (!canSelectCourse(courseHours)) {
             alert(`Cannot select this course! This course requires ${courseHours} credit hours, but you only have ${remainingCreditHours} credit hours remaining.`);
             checkbox.checked = false;
             event.preventDefault();
             return;
         }
-        
+
         if (wouldExceedLimit(courseHours)) {
             alert(`Cannot select this course! Adding ${courseHours} credit hours would exceed your maximum allowed ${maxCreditHours} credit hours.`);
             checkbox.checked = false;
@@ -163,7 +163,7 @@ function handleCheckboxChange(event) {
             return;
         }
     }
-    
+
 
     updateRemainingCreditHours();
     updateMainSelectorState();
@@ -186,21 +186,21 @@ function updateMainSelectorState() {
 
 function ChooseAll() {
     const selectAll = MainSelector.checked;
-    
+
     if (selectAll) {
         let potentialTotalHours = 0;
         for (let i = 1; i < checkboxes.length; i++) {
             const hours = getCheckboxCreditHours(checkboxes[i]);
             potentialTotalHours += hours;
         }
-        
+
         if (potentialTotalHours > maxCreditHours) {
             alert(`Cannot select all courses! Total credit hours (${potentialTotalHours}) exceeds your maximum allowed (${maxCreditHours}) based on your GPA.`);
             MainSelector.checked = false;
             return;
         }
     }
-    
+
     for (var i = 1; i < checkboxes.length; i++) {
         checkboxes[i].checked = selectAll;
     }
@@ -224,20 +224,20 @@ function initializeCheckboxRestrictions() {
 function displayCreditHourStatus() {
     const currentHours = getCurrentCreditHours();
     updateRemainingCreditHours();
-    
+
     console.log(`Credit Hours: ${currentHours}/${maxCreditHours} (${remainingCreditHours} remaining)`);
-    
+
     const statusElement = document.getElementById('creditHourStatus');
     if (statusElement) {
         statusElement.textContent = `Credit Hours: ${currentHours}/${maxCreditHours} (${remainingCreditHours} remaining)`;
         statusElement.style.color = currentHours > maxCreditHours ? 'red' : 'green';
     }
-    
+
     for (let i = 1; i < checkboxes.length; i++) {
         const checkbox = checkboxes[i];
         const row = checkbox.closest("tr");
         const courseHours = getCheckboxCreditHours(checkbox);
-        
+
         if (checkbox.checked) {
             checkbox.disabled = false;
             row.style.opacity = "1";
@@ -259,7 +259,7 @@ function displayCreditHourStatus() {
 function updateCreditHourStatus() {
     displayCreditHourStatus();
 }
-document.addEventListener('change', function(event) {
+document.addEventListener('change', function (event) {
     if (event.target.classList.contains('CB')) {
         updateCreditHourStatus();
     }
@@ -279,9 +279,9 @@ function loadStudentInformation() {
         .then(data => {
             if (data.success) {
                 const studentInfo = data.data;
-                
+
                 const studentInputs = document.querySelectorAll('.StudentInformation input[type="text"]');
-                
+
                 if (studentInputs.length >= 6) {
                     studentInputs[0].value = studentInfo.FullName || 'N/A';           // Full Name
                     studentInputs[1].value = studentInfo.StudentID || 'N/A';          // Student ID
@@ -290,7 +290,7 @@ function loadStudentInformation() {
                     studentInputs[4].value = studentInfo.PhoneNumber || 'N/A';        // Contact Information
                     studentInputs[5].value = studentInfo.AcademicYear || 'N/A';       // Year of Enrolment
                 }
-                
+
                 console.log('Student information loaded successfully');
             } else {
                 console.error('Failed to load student information:', data.message);
@@ -363,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
 
                     courseTable.appendChild(row);
-                    
+
                     setTimeout(() => {
                         row.style.opacity = "1";
                     }, index * 200);
@@ -402,7 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 });
-
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -471,57 +470,12 @@ var fileInput = document.getElementsByClassName("PaymentInputInformation")[2];
 var fileInputBackground = document.getElementsByClassName("fileInputBackground")[0];
 
 fileInput.addEventListener("change", function () {
-  if (fileInput.files.length > 0) {
-    fileInputBackground.style.backgroundColor = "White";
-  } else {
-    fileInputBackground.style.backgroundColor = "transparent";
-  }
-});
-
-///////////////////////////////////////////////////////////////////
-////////       Input Validation check
-
-var InputValues = document.getElementsByClassName("PaymentInputInformation");
-var RegistrationTitle = document.getElementsByClassName
-function AllFilledIn() {
-  for (let i = 0; i < InputValues.length-1; i++) {
-    const input = InputValues[i];
-
-    if (input.type === "file") {
-      if (input.files.length === 0) {
-        alert("Please upload your receipt.");
-        return;
-      }
-    }else if (input.tagName === "SELECT") {
-      if (input.selectedIndex === 0 || input.value.trim() === "") {
-        alert("Please select a banking type.");
-        return;
-      }
-    }else if (input.value.trim() === "") {
-      alert("Please fill out all required fields.");
-      return;
+    if (fileInput.files.length > 0) {
+        fileInputBackground.style.backgroundColor = "White";
+    } else {
+        fileInputBackground.style.backgroundColor = "transparent";
     }
-  }
-  PaymentPage.style.transition = "opacity 0.5s";
-  PaymentPage.style.opacity = "0";
-
-  setTimeout(function () {
-    PaymentPage.style.display = "none";
-    FinacialRecietPage.style.display = "block";
-
-    FinacialRecietPage.style.opacity = "0";
-    FinacialRecietPage.style.transition = "opacity 0.5s";
-    setTimeout(function () {
-      FinacialRecietPage.style.opacity = "1";
-    }, 50);
-  }, 500);
-  
-  CheckCircles[1].src = "../Icons/GoCheckmark.png";
-  CheckCircles[2].src = "../Icons/GoCheckmark.png";
-  ChangingRegistrationHeader();
-}
-
-subPay.onclick = AllFilledIn;
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////
 /////  Removing the Registration Paragraph and changing the Registration Receipt
@@ -529,12 +483,12 @@ var RegTitle = document.getElementsByClassName("RegTitleH1")[0];
 var RegParagraph = document.getElementsByClassName("RegParagraph")[0];
 
 function ChangingRegistrationHeader() {
-  RegTitle.textContent = "Registration Receipt";
-  RegParagraph.style.transition = "opacity 0.5s ease-in-out";
-  RegParagraph.style.opacity = "0";
-  setTimeout(function () {
-    RegParagraph.style.display = "none";
-  }, 500);
+    RegTitle.textContent = "Registration Receipt";
+    RegParagraph.style.transition = "opacity 0.5s ease-in-out";
+    RegParagraph.style.opacity = "0";
+    setTimeout(function () {
+        RegParagraph.style.display = "none";
+    }, 500);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -600,101 +554,184 @@ document.querySelector('.SubmitButton').addEventListener('click', function (e) {
     });
 });
 
-///////////////////////////////////////////////////////////
-///// Transaction Information on Registration Reciet
+///////////////////////////////////////////////////////////////////
+/////     Transaction Information on Registration Reciet     //////
+///////////////////////////////////////////////////////////////////
 
 document.querySelector('.SubmittingPayment').addEventListener('click', function () {
-  const accountNumber = document.getElementById('AccountNumber').value.trim();
-  console.log(accountNumber);
-  const bankName = document.getElementById('BankName').options[document.getElementById('BankName').selectedIndex].text.trim();
-  console.log(bankName);
-  const transactionID = document.getElementById('TransactionID').value.trim();
-  console.log(transactionID);
-  const TotalAmount = document.getElementById('TotalAmount').value.trim();
-  console.log(TotalAmount);
-  const dateOfPayment = new Date().toLocaleDateString();
-  console.log(dateOfPayment);
+    const accountNumber = document.getElementById('AccountNumber').value.trim();
+    console.log(accountNumber);
+    const bankName = document.getElementById('BankName').options[document.getElementById('BankName').selectedIndex].text.trim();
+    console.log(bankName);
+    const transactionID = document.getElementById('TransactionID').value.trim();
+    console.log(transactionID);
+    const TotalAmount = document.getElementById('TotalAmount').value.trim();
+    console.log(TotalAmount);
+    const dateOfPayment = new Date().toLocaleDateString();
+    console.log(dateOfPayment);
 
-  document.querySelector('.A_Number').textContent = accountNumber;
-  document.querySelector('.BankName').textContent = bankName;
-  document.querySelector('.TID').textContent = transactionID;
-  document.querySelector('.AmPayed').textContent = TotalAmount;
-  document.querySelector('.DAP').textContent = dateOfPayment;
+    document.querySelector('.A_Number').textContent = accountNumber;
+    document.querySelector('.BankName').textContent = bankName;
+    document.querySelector('.TID').textContent = transactionID;
+    document.querySelector('.AmPayed').textContent = TotalAmount;
+    document.querySelector('.DAP').textContent = dateOfPayment;
 
 });
 
-  /////////////////////////////////////////////////////////////////////////////
- ////      Inserting the Registration Information Into Database Table    /////
+///////////////////////////////////////////////////////////////////
+/////////              Input Validation check         /////////////
+///////////////////////////////////////////////////////////////////
+
+var InputValues = document.getElementsByClassName("PaymentInputInformation");
+var RegistrationTitle = document.getElementsByClassName
+function AllFilledIn() {
+    for (let i = 0; i < InputValues.length - 1; i++) {
+        const input = InputValues[i];
+
+        if (input.type === "file") {
+            if (input.files.length === 0) {
+                alert("Please upload your receipt.");
+                return false;
+            }
+        } else if (input.tagName === "SELECT") {
+            if (input.selectedIndex === 0 || input.value.trim() === "") {
+                alert("Please select a banking type.");
+                return false;
+            }
+        } else if (input.value.trim() === "") {
+            alert("Please fill out all required fields.");
+            return false;
+        }
+    }
+    PaymentPage.style.transition = "opacity 0.5s";
+    PaymentPage.style.opacity = "0";
+
+    setTimeout(function () {
+        PaymentPage.style.display = "none";
+        FinacialRecietPage.style.display = "block";
+
+        FinacialRecietPage.style.opacity = "0";
+        FinacialRecietPage.style.transition = "opacity 0.5s";
+        setTimeout(function () {
+            FinacialRecietPage.style.opacity = "1";
+        }, 50);
+    }, 500);
+
+    CheckCircles[1].src = "../Icons/GoCheckmark.png";
+    CheckCircles[2].src = "../Icons/GoCheckmark.png";
+    ChangingRegistrationHeader();
+    return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+////      Inserting the Registration Information Into Database Table    /////
 /////////////////////////////////////////////////////////////////////////////
 
-// Function to handle registration submission
-function submitRegistration() {
-    const transactionID = document.getElementById('TransactionID').value.trim();
-    const bankName = document.getElementById('BankName').value;
+// Add event listener to the submit button
+document.querySelector('.SubmittingPayment').addEventListener('click', function () {
+    if (AllFilledIn()) {
+        const registrationData = collectRegistrationData();
+        console.log('Registration Data:', registrationData);
+        sendRegistrationData(registrationData);
+    }
+});
+
+function collectRegistrationData() {
+    // Collect selected course codes
+    const selectedCourses = [];
+    const checkboxes = document.querySelectorAll('.CourseContent .CB');
+    const courseCodeCells = document.querySelectorAll('.CourseContent .CourseID');
+
+    let courseCount = 0;
+    checkboxes.forEach((checkbox, index) => {
+        if (checkbox.checked && courseCodeCells[index].textContent.trim() !== '') {
+            selectedCourses.push(courseCodeCells[index].textContent.trim());
+            courseCount++;
+        }
+    });
+
+    // Limit courses to 40 characters as per VARCHAR(40)
+    let courseCodesString = selectedCourses.join(', ');
+    if (courseCodesString.length > 40) {
+        courseCodesString = courseCodesString.substring(0, 40);
+    }
+
+    // Get current date and time in YYYY-MM-DD format for MySQL DATE
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    // Get other form values with length validation
+    const accountNumber = document.getElementById('AccountNumber').value.substring(0, 40); // VARCHAR(40)
+    const transactionID = document.getElementById('TransactionID').value.substring(0, 15); // VARCHAR(15)
     const totalAmount = document.getElementById('TotalAmount').value;
-    const accountNumber = document.getElementById('AccountNumber').value.trim();
-    
-    const selectedCourses = getSelectedCourses();
+    const bankName = document.getElementById('BankName').value.substring(0, 100); // VARCHAR(100)
 
-    if (!transactionID) {
-        alert('Please enter Transaction ID');
-        return;
-    }
-    if (!bankName || bankName === ' ') {
-        alert('Please select a bank');
-        return;
-    }
-    if (!accountNumber) {
-        alert('Please enter your bank account number');
-        return;
-    }
-    if (selectedCourses.length === 0) {
-        alert('Please select at least one course');
-        return;
-    }
-    if (totalAmount === '------' || totalAmount === 'XXXX.XX') {
-        alert('Invalid total amount');
-        return;
+    // Parse transaction amount properly - handle commas, decimals, etc.
+    let transactionAmount = 0;
+    if (totalAmount) {
+        // Remove any commas, currency symbols, and extra spaces
+        const cleanAmount = totalAmount.replace(/[$,]/g, '').trim();
+        transactionAmount = parseFloat(cleanAmount);
+
+        // If parseFloat returns NaN, set to 0
+        if (isNaN(transactionAmount)) {
+            transactionAmount = 0;
+        }
     }
 
-    const transactionAmount = parseFloat(totalAmount.replace(/[^\d.]/g, ''));
-    if (isNaN(transactionAmount) || transactionAmount <= 0) {
-        alert('Invalid transaction amount');
-        return;
-    }
+    // Store all data in a const variable
+    const registrationData = {
+        courseCodes: courseCodesString,
+        registrationDate: currentDate,
+        bankAccountNumber: accountNumber,
+        transactionID: transactionID,
+        transactionAmount: transactionAmount, // FLOAT - now properly parsed
+        bankName: bankName,
+        totalCourses: courseCount // INT
+    };
 
-    const formData = new URLSearchParams();
-    formData.append('transaction_id', transactionID);
-    formData.append('transaction_amount', transactionAmount);
-    formData.append('bank_name', bankName);
-    formData.append('bank_account_number', accountNumber);
-    selectedCourses.forEach(course => formData.append('selected_courses[]', course));
+    console.log('Parsed Transaction Amount:', transactionAmount);
+    return registrationData;
+}
 
-    alert('🔄 Processing your registration...');
+function sendRegistrationData(registrationData) {
+    const formData = new FormData();
 
+    // Append all data to FormData with proper data types
+    formData.append('courses', registrationData.courseCodes);
+    formData.append('registrationDate', registrationData.registrationDate);
+    formData.append('bankAccountNumber', registrationData.bankAccountNumber);
+    formData.append('transactionID', registrationData.transactionID);
+    formData.append('transactionAmount', registrationData.transactionAmount.toFixed(2)); // Send as string with 2 decimal places
+    formData.append('bankName', registrationData.bankName);
+    formData.append('totalAmountOfCourse', registrationData.totalCourses.toString());
+
+    console.log('Sending Transaction Amount:', registrationData.transactionAmount.toFixed(2));
+
+    // Send data to PHP
     fetch('PlacingRegistration.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(`✅ Registration Successful!\n\nCourses Registered: ${data.courses_registered}\nTotal Courses: ${data.total_courses}`);
-            resetRegistrationForm();
-        } else {
-            alert('❌ Registration Failed: ' + data.message);
-        }
-    })
-    .catch(error => {
-        alert('❌ Network Error: Please try again');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ ' + data.message);
+            } else {
+                alert('❌ ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ An error occurred while processing your registration.');
+        });
 }
 
 // Function to get selected course codes
 function getSelectedCourses() {
     const checkboxes = document.getElementsByClassName("CB");
     const selectedCourses = [];
-    
+
     for (let i = 1; i < checkboxes.length; i++) {
         if (checkboxes[i].checked) {
             const row = checkboxes[i].closest("tr");
@@ -709,7 +746,7 @@ function getSelectedCourses() {
 function resetRegistrationForm() {
     document.getElementById('PaymentInputForm').reset();
     document.getElementById('TotalAmount').value = '------';
-    
+
     // Uncheck all course checkboxes
     const checkboxes = document.getElementsByClassName("CB");
     for (let i = 0; i < checkboxes.length; i++) {
@@ -721,7 +758,7 @@ function resetRegistrationForm() {
 function initializeRegistrationSystem() {
     const submitButton = document.querySelector('.SubmittingPayment');
     if (submitButton) {
-        submitButton.addEventListener('click', function(event) {
+        submitButton.addEventListener('click', function (event) {
             event.preventDefault();
             submitRegistration();
         });
@@ -737,27 +774,27 @@ document.addEventListener('DOMContentLoaded', initializeRegistrationSystem);
 
 async function checkPrerequisites() {
     const selectedCourses = getSelectedCourses();
-    
+
     if (selectedCourses.length === 0) {
         alert('Please select at least one course before submitting.');
         return false;
     }
-    
+
     try {
         const formData = new FormData();
         formData.append('selected_courses', JSON.stringify(selectedCourses));
-        
+
         const response = await fetch('AddRegistration.php', {
             method: 'POST',
             body: formData
         });
-        
+
         if (!response.ok) {
             throw new Error(`Server returned ${response.status} error`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             if (data.has_prerequisite_issues) {
                 handlePrerequisiteIssues(data.results);
@@ -780,7 +817,7 @@ function handlePrerequisiteIssues(prerequisiteResults) {
     let alertMessage = "Prerequisite Issues Found:\n\n";
     let coursesWithIssues = [];
     let hasIssues = false;
-    
+
     for (const [courseCode, result] of Object.entries(prerequisiteResults)) {
         if (!result.can_take_course) {
             alertMessage += `• ${courseCode}: ${result.message}\n\n`;
@@ -788,7 +825,7 @@ function handlePrerequisiteIssues(prerequisiteResults) {
             hasIssues = true;
         }
     }
-    
+
     if (hasIssues) {
         alertMessage += "The courses with incomplete prerequisites have been dimmed and made inaccessible. Please review your selection.";
         alert(alertMessage);
@@ -798,13 +835,13 @@ function handlePrerequisiteIssues(prerequisiteResults) {
 
 function dimProblematicCourses(coursesWithIssues) {
     const checkboxes = document.getElementsByClassName("CB");
-    
+
     for (let i = 1; i < checkboxes.length; i++) {
         const checkbox = checkboxes[i];
         const row = checkbox.closest("tr");
         const courseCodeCell = row.querySelector(".CourseID");
         const courseCode = courseCodeCell.textContent.trim();
-        
+
         if (coursesWithIssues.includes(courseCode)) {
             row.style.opacity = "0.1";
             row.style.pointerEvents = "none";
@@ -822,7 +859,7 @@ function dimProblematicCourses(coursesWithIssues) {
 function getSelectedCourses() {
     const checkboxes = document.getElementsByClassName("CB");
     const selectedCourses = [];
-    
+
     for (let i = 1; i < checkboxes.length; i++) {
         if (checkboxes[i].checked && !checkboxes[i].disabled) {
             const row = checkboxes[i].closest("tr");
@@ -837,7 +874,7 @@ function getSelectedCourses() {
 
 function resetCourseAppearance() {
     const checkboxes = document.getElementsByClassName("CB");
-    
+
     for (let i = 1; i < checkboxes.length; i++) {
         const checkbox = checkboxes[i];
         const row = checkbox.closest("tr");
@@ -851,13 +888,13 @@ async function SubmitSelection(event) {
     if (event) {
         event.preventDefault();
     }
-    
+
     const prerequisitesMet = await checkPrerequisites();
     if (!prerequisitesMet) return false;
-    
+
     const checkboxes = document.getElementsByClassName("CB");
     let hasCheckedCourses = Array.from(checkboxes).some(cb => cb.checked && !cb.disabled);
-    
+
     if (!hasCheckedCourses) {
         alert('Please select at least one course.');
         return false;
@@ -876,14 +913,14 @@ async function SubmitSelection(event) {
 
     CheckCircles[0].src = "../Icons/GoCheckmark.png";
     CheckCircles[1].src = "../Icons/WhiteFilledCircle.png";
-    
+
     return true;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const registerIcon = document.getElementById("RegisterIcon");
     if (registerIcon) registerIcon.addEventListener("click", () => setTimeout(resetCourseAppearance, 100));
-    
+
     const SubmitButton = document.getElementsByClassName("SubmitButton")[0];
     if (SubmitButton) SubmitButton.addEventListener('click', SubmitSelection);
 
@@ -926,5 +963,210 @@ function updateTotal() {
 document.addEventListener("change", function (event) {
     if (event.target.classList.contains("CB")) {
         updateTotal();
+    }
+});
+
+
+//////////////////////////////////////////////////////////////////
+//////            Add Course On the Add Panel             ////////
+//////////////////////////////////////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", () => {
+    const addIcon = document.getElementById("AddIcon");
+    const addPanel = document.querySelector(".AddPanel");
+    const addCourseTable = document.querySelector(".AddPanel .CourseContent");
+
+    addIcon.addEventListener("click", () => {
+        fetch("RetriveAddCourse.php")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    addPanel.style.display = "none";
+                    alert(data.message);
+                    return;
+                }
+
+                // Show the add panel
+                addPanel.style.display = "block";
+
+                // Hide other panels
+                document.querySelector(".RegisterationPanel").style.display = "none";
+                document.querySelector(".AccountInfo").style.display = "none";
+                document.querySelector(".BaseDisplay").style.display = "none";
+
+                // Clear existing rows except header
+                const existingRows = addCourseTable.querySelectorAll("tr:not(:first-child)");
+                existingRows.forEach(row => row.remove());
+
+                // Check if there are courses available
+                if (data.data.length === 0) {
+                    const noCoursesRow = document.createElement("tr");
+                    noCoursesRow.innerHTML = `
+                        <td colspan="5" style="text-align: center; padding: 20px; color: #666; font-style: italic;">
+                            No courses available for add request at this time.
+                        </td>
+                    `;
+                    addCourseTable.appendChild(noCoursesRow);
+                    return;
+                }
+
+                // Add courses to the table with fade-in animation
+                data.data.forEach((course, index) => {
+                    const row = document.createElement("tr");
+                    row.style.opacity = "0";
+                    row.style.transition = "opacity 0.5s ease-in-out";
+
+                    row.innerHTML = `
+                        <td class="CheckBox">
+                            <input type="checkbox" class="CB" 
+                                   data-course-code="${course.CourseCode}" 
+                                   data-course-fee="${course.CourseFee}">
+                        </td>
+                        <td class="CourseID">${course.CourseCode || 'N/A'}</td>
+                        <td class="CourseTitle">${course.CourseTitle || 'N/A'}</td>
+                        <td class="CreditHour">${course.CreditHours || 'N/A'}</td>
+                        <td class="CourseFee">${course.CourseFee ? course.CourseFee : 'N/A'}</td>
+                    `;
+
+                    addCourseTable.appendChild(row);
+
+                    // Animate row appearance
+                    setTimeout(() => {
+                        row.style.opacity = "1";
+                    }, index * 150);
+                });
+
+                // Add submit button if not exists
+                addSubmitButton();
+
+                // Add event listener for checkboxes
+                addCheckboxEventListeners();
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                addPanel.style.display = "none";
+                alert("Error loading available courses: " + err.message);
+            });
+    });
+
+    function addSubmitButton() {
+        // Remove existing submit button if any
+        const existingButton = document.querySelector('.AddPanel .SubmitButton');
+        if (existingButton) {
+            existingButton.remove();
+        }
+
+        // Add new submit button
+        const applySection = document.querySelector('.ApplySection');
+        const submitButton = document.createElement('button');
+        submitButton.type = 'button';
+        submitButton.className = 'SubmitButton';
+        submitButton.textContent = 'Submit Add Request';
+        submitButton.addEventListener('click', handleAddRequestSubmit);
+
+        // Apply styles correctly
+        submitButton.style.background = 'linear-gradient(0deg, #3a3f48, #2a2e36)';
+        submitButton.style.color = 'white';
+        submitButton.style.marginTop = '7px';
+        submitButton.style.padding = '8px 36px';
+        submitButton.style.border = 'none';
+        submitButton.style.borderRadius = '10px';
+        submitButton.style.fontSize = '18px';
+        submitButton.style.float = 'right';
+
+        applySection.appendChild(submitButton);
+    }
+
+
+    function addCheckboxEventListeners() {
+        const checkboxes = addCourseTable.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCourses);
+        });
+    }
+
+    function updateSelectedCourses() {
+        const selectedCourses = [];
+        const checkboxes = addCourseTable.querySelectorAll('input[type="checkbox"]:checked');
+
+        checkboxes.forEach(checkbox => {
+            selectedCourses.push({
+                courseCode: checkbox.getAttribute('data-course-code'),
+                courseFee: checkbox.getAttribute('data-course-fee')
+            });
+        });
+
+        console.log('Selected courses for add request:', selectedCourses);
+    }
+
+    function handleAddRequestSubmit() {
+        const selectedCourses = [];
+        const checkboxes = addCourseTable.querySelectorAll('input[type="checkbox"]:checked');
+
+        if (checkboxes.length === 0) {
+            alert('Please select at least one course to add.');
+            return;
+        }
+
+        checkboxes.forEach(checkbox => {
+            selectedCourses.push(checkbox.getAttribute('data-course-code'));
+        });
+
+        // Confirm with user
+        const confirmation = confirm(`You are about to submit add requests for ${selectedCourses.length} course(s). Continue?`);
+
+        if (confirmation) {
+            submitAddRequest(selectedCourses);
+        }
+    }
+
+    function submitAddRequest(selectedCourses) {
+        // Create form data
+        const formData = new FormData();
+        formData.append('student_id', '<?php echo $_SESSION["studentid"]; ?>');
+        formData.append('courses', JSON.stringify(selectedCourses));
+        formData.append('action', 'add_course_request');
+
+        // Submit the add request
+        fetch('SubmitAddRequest.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Add request submitted successfully!');
+                    // Optionally refresh the course list or reset the form
+                    addPanel.style.display = 'none';
+                    document.querySelector(".BaseDisplay").style.display = 'block';
+                } else {
+                    alert('Error submitting add request: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Submission error:', err);
+                alert('Error submitting add request. Please try again.');
+            });
+    }
+
+    // Optional: Add a back button functionality
+    function addBackButton() {
+        const backButton = document.createElement('button');
+        backButton.type = 'button';
+        backButton.className = 'BackButton';
+        backButton.textContent = 'Back to Main';
+        backButton.style.marginRight = '10px';
+        backButton.addEventListener('click', () => {
+            addPanel.style.display = 'none';
+            document.querySelector(".BaseDisplay").style.display = 'block';
+        });
+
+        const applySection = document.querySelector('.ApplySection');
+        applySection.appendChild(backButton);
     }
 });

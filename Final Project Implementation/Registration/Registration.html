@@ -23,7 +23,7 @@
                 </ul>
             </li>
         </ul>
-        <button>Logout</button>
+        <button><a href="http://localhost:8000/Login/LoginPage.html">Logout</a></button>
     </nav>
 
     <section class="container">
@@ -173,7 +173,8 @@
                                     style="width: 100px; height: 100px; cursor: pointer;" />
                                 <p>Upload Reciet</p>
                             </label>
-                            <input type="file" id="fileUpload" style="display: none;" class="PaymentInputInformation">
+                            <input type="file" id="fileUpload" style="display: none;" class="PaymentInputInformation"
+                                accept=".pdf, image/png, image/jpeg">
                         </div>
                         <div>
                             <fieldset>
@@ -285,18 +286,22 @@
                 </section>
             </section>
             <section class="AddPanel">
-                <h1>Add Course Request</h1>
-                <hr>
-                <table border="" cellspacing="5px" cellpadding="10px" class="CourseContent">
-                    <td class="CheckBox">
-                        <input type="checkbox" class="CB">
-                    </td>
-                    <td class="CourseID">Course Code</td>
-                    <td class="CourseTitle">Course Title</td>
-                    <td class="CreditHour">Credit Hour</td>
-                    <td class="CourseFee">Payment Fee</td>
-                    </tr>
-                </table>
+                <div class="ApplySection">
+                    <h1>Add Course Request</h1>
+                    <hr>
+                    <table cellspacing="5px" cellpadding="10px" class="CourseContent">
+                        <tr>
+                            <td class="CheckBox"></td>
+                            <td class="CourseID">Course Code</td>
+                            <td class="CourseTitle">Course Title</td>
+                            <td class="CreditHour">Credit Hour</td>
+                            <td class="CourseFee">Payment Fee</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="RequestResponceSection">
+                    
+                </div>
             </section>
             <section class="AccountInfo">
                 <div class="AccountInfoHeader">
@@ -390,7 +395,7 @@
                             <img src="../Icons/Banking Logos/ZamZam Bank-icon.png" alt="" width="60px" height="60px">
                             <hr
                                 style="width: 2px; height: 55px; padding: 0px; margin: 0px; background-color: white; border: none;">
-                            <p><u>ZamZam Bank</u><br> acc: 1300334455667</p>
+                            <p><u>ZemZem Bank</u><br> acc: 1300334455667</p>
                         </div>
                         <div>
                             <img src="../Icons/Banking Logos/Ahadu Bank-icon.png" alt="" width="60px" height="60px">

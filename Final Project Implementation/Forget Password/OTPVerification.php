@@ -35,7 +35,7 @@ try {
     $valid_otp_count = $pre_check_row['otp_count'];
 
     if ($valid_otp_count == 0) {
-        $response = ["status" => "failure", "message" => "OTP is invalid or expired"];
+        $response = ["status" => "failure", "message" => "OTP is invalid or expired", "otp_count" => $valid_otp_count];
         echo json_encode($response);
         exit;
     }
@@ -60,15 +60,15 @@ try {
     }
 
     if ($valid_otp_count > 0) {
-        $response = ["status" => "success", "message" => "Verified"];
+        $response = ["status" => "success", "message" => "Verified", "otp_count" => $valid_otp_count];
     } else {
-        $response = ["status" => "failure", "message" => "OTP is invalid or expired"];
+        $response = ["status" => "failure", "message" => "OTP is invalid or expired", "otp_count" => $valid_otp_count];
     }
 
     $conn->close();
 
 } catch (Exception $e) {
-    $response = ["status" => "error", "message" => "Verification failed"];
+    $response = ["status" => "error", "message" => "Verification failed", "otp_count" => $valid_otp_count];
 }
 
 // FINAL OUTPUT - ONLY JSON, NOTHING ELSE

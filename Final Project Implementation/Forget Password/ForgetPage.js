@@ -226,9 +226,11 @@ function verifyOTPWithServer(otpValue) {
     })
     .then(response => {
         // First, get the raw text response
+        console.log(response)
         return response.text().then(text => {
             try {
                 // Try to parse as JSON
+                console.log(text)
                 const data = JSON.parse(text);
                 return data;
             } catch (e) {

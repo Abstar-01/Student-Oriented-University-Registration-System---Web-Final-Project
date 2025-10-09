@@ -3,7 +3,7 @@ let otpAttempts = 0;
 const MAX_OTP_ATTEMPTS = 3;
 let currentEmail = '';
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     initializeApplication();
 });
 
@@ -55,7 +55,7 @@ function showPanel(panelId) {
     document.querySelectorAll('.panel').forEach(panel => {
         panel.style.display = 'none';
     });
-    
+
     // Show target panel
     const targetPanel = document.getElementById(panelId);
     if (targetPanel) {
@@ -65,7 +65,7 @@ function showPanel(panelId) {
     // Panel-specific initialization
     if (panelId === 'OTP_Panel') {
         resetOTPFields();
-        startTimer(60);
+        startTimer(90);
         enableOTPSubmission();
     } else if (panelId === 'EmailPanel') {
         otpAttempts = 0; // Reset attempts when returning to email
@@ -114,7 +114,7 @@ function validateEmail(email) {
 function verifyEmailWithServer(email) {
     const sendButton = document.querySelector('#EmailPanel .SendButton');
     const originalText = sendButton.textContent;
-    
+
     sendButton.textContent = "Sending...";
     sendButton.disabled = true;
 
@@ -125,32 +125,32 @@ function verifyEmailWithServer(email) {
         },
         body: `email=${encodeURIComponent(email)}`
     })
-    .then(async response => {
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
-        
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            const text = await response.text();
-            throw new Error(`Unexpected response format`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        sendButton.textContent = originalText;
-        sendButton.disabled = false;
+        .then(async response => {
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
-        if (data.status === 'success') {
-            showPanel('OTP_Panel');
-        } else {
-            alert(data.message || 'Email verification failed.');
-        }
-    })
-    .catch(error => {
-        sendButton.textContent = originalText;
-        sendButton.disabled = false;
-        alert('An error occurred. Please try again.');
-        console.error('Email verification error:', error);
-    });
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await response.text();
+                throw new Error(`Unexpected response format`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            sendButton.textContent = originalText;
+            sendButton.disabled = false;
+
+            if (data.status === 'success') {
+                showPanel('OTP_Panel');
+            } else {
+                alert(data.message || 'Email verification failed.');
+            }
+        })
+        .catch(error => {
+            sendButton.textContent = originalText;
+            sendButton.disabled = false;
+            alert('An error occurred. Please try again.');
+            console.error('Email verification error:', error);
+        });
 }
 
 function initializeOTPPanel() {
@@ -182,7 +182,7 @@ function validateOTPInputs() {
     const inputs = document.querySelectorAll('#OTP_Panel .otp-input');
     let allFilled = true;
     let otpValue = '';
-    
+
     inputs.forEach((input) => {
         const value = input.value.trim();
         if (!value) allFilled = false;
@@ -204,69 +204,165 @@ function validateOTPInputs() {
     return { isValid: true, otpValue: otpValue };
 }
 
-function verifyOTPWithServer(otpValue) {
-    const submitButton = document.querySelector('#OTP_Panel .SubmitButton');
-    const originalText = submitButton.textContent;
-    
-    submitButton.textContent = "Verifying...";
-    submitButton.disabled = true;
+document.addEventListener("DOMContentLoaded", function () {
+    const otpInputs = document.querySelectorAll(".otp-input");
+    const submitButton = document.querySelector(".SubmitButton");
+    const resendLink = document.querySelector(".ResendOTP");
 
-    const inputs = document.querySelectorAll('#OTP_Panel .otp-input');
-    let otpData = {};
-    inputs.forEach((input, index) => {
-        otpData[`otp${index + 1}`] = input.value;
-    });
+    // Optional message boxes (if not in HTML)
+    let errorBox = document.getElementById("otp-error");
+    let successBox = document.getElementById("otp-success");
+    if (!errorBox || !successBox) {
+        const messageContainer = document.createElement("div");
+        errorBox = document.createElement("p");
+        successBox = document.createElement("p");
+        messageContainer.appendChild(errorBox);
+        messageContainer.appendChild(successBox);
+        document.querySelector(".OTPForm").appendChild(messageContainer);
+    }
 
-    fetch('OTPVerification.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(otpData).toString()
-    })
-    .then(response => {
-        // First, get the raw text response
-        console.log(response)
-        return response.text().then(text => {
-            try {
-                // Try to parse as JSON
-                console.log(text)
-                const data = JSON.parse(text);
-                return data;
-            } catch (e) {
-                // If JSON parsing fails, throw an error with the raw text
-                console.error('Raw server response (not JSON):', text);
-                throw new Error(`Server returned invalid JSON. Response: ${text.substring(0, 100)}`);
+    // Auto-move focus when typing
+    otpInputs.forEach((input, index) => {
+        input.addEventListener("input", () => {
+            if (input.value.length === 1 && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
             }
         });
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && input.value === "" && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+    });
+
+    // Handle Submit click
+    submitButton.addEventListener("click", async function () {
+        const otp1 = document.getElementById("otp1").value.trim();
+        const otp2 = document.getElementById("otp2").value.trim();
+        const otp3 = document.getElementById("otp3").value.trim();
+        const otp4 = document.getElementById("otp4").value.trim();
+
+        const otp = otp1 + otp2 + otp3 + otp4;
+
+        errorBox.textContent = "";
+        successBox.textContent = "";
+
+        if (otp.length !== 4 || !/^\d{4}$/.test(otp)) {
+            alert("Please enter a valid 4-digit OTP.");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("otp1", otp1);
+            formData.append("otp2", otp2);
+            formData.append("otp3", otp3);
+            formData.append("otp4", otp4);
+
+            const response = await fetch("OTPVerification.php", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server returned status ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+                alert(result.message);
+                showPanel('RestPanel');
+            } else if (result.status === "failure") {
+                alert(result.message);
+            } else {
+                alert(result.message || "An unexpected error occurred.");
+            }
+        } catch (err) {
+            alert("Network or server error: " + err.message);
+        }
+    });
+
+    // Handle Resend OTP click
+    resendLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        alert("Resending OTP... (implement resend logic)");
+    });
+});
+
+
+  //////////////////////////////////////////////////////////////////////////
+ ///////////////          Resend Functionality           //////////////////
+//////////////////////////////////////////////////////////////////////////
+
+function handleResendOTP(e) {
+    e.preventDefault();
+    
+    const resendLink = e.target;
+    const originalText = resendLink.textContent;
+    
+    // Disable resend link temporarily to prevent spam
+    resendLink.style.pointerEvents = 'none';
+    resendLink.textContent = "Sending...";
+    resendLink.style.opacity = "0.6";
+    
+    fetch('ResendOTP.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(async response => {
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            throw new Error(`Unexpected response format`);
+        }
+        return response.json();
     })
     .then(data => {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-
+        // Re-enable resend link
+        resendLink.style.pointerEvents = 'auto';
+        resendLink.textContent = originalText;
+        resendLink.style.opacity = "1";
+        
         if (data.status === 'success') {
-            otpAttempts = 0;
-            showPanel('RestPanel');
+            // Reset timer and OTP fields
+            resetOTPFields();
+            startTimer(90);
+            enableOTPSubmission();
+            alert(data.message || "New OTP has been sent to your email.");
         } else {
-            otpAttempts++;
-            const attemptsLeft = MAX_OTP_ATTEMPTS - otpAttempts;
-            
-            if (attemptsLeft > 0) {
-                alert(`${data.message}\n\nYou have ${attemptsLeft} attempt(s) remaining.`);
-                resetOTPFields();
-            } else {
-                alert(`${data.message}\n\nNo attempts remaining. Please request a new OTP.`);
-                disableOTPSubmission();
-            }
+            alert(data.message || "Failed to resend OTP. Please try again.");
         }
     })
     .catch(error => {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-        alert("OTP verification failed. Please try again.");
-        console.error("OTP verification error:", error);
+        // Re-enable resend link on error
+        resendLink.style.pointerEvents = 'auto';
+        resendLink.textContent = originalText;
+        resendLink.style.opacity = "1";
+        
+        alert('An error occurred while resending OTP. Please try again.');
+        console.error('Resend OTP error:', error);
     });
 }
+
+// Add this to your initializeOTPPanel function:
+function initializeOTPPanel() {
+    const submitButton = document.querySelector('#OTP_Panel .SubmitButton');
+    const resendLink = document.querySelector('.ResendOTP');
+    
+    if (submitButton) {
+        submitButton.addEventListener('click', handleOTPSubmission);
+    }
+    
+    if (resendLink) {
+        resendLink.addEventListener('click', handleResendOTP);
+    }
+}
+
 
 function initializeRestPanel() {
     const submitButton = document.querySelector('#RestPanel .SendButton');
@@ -275,7 +371,7 @@ function initializeRestPanel() {
 
     if (submitButton && passwordInput && confirmInput) {
         submitButton.addEventListener('click', handlePasswordReset);
-        
+
         [passwordInput, confirmInput].forEach(input => {
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') handlePasswordReset();
@@ -287,7 +383,7 @@ function initializeRestPanel() {
 function handlePasswordReset() {
     const passwordInput = document.querySelector('#RestPanel .RestPassword input');
     const confirmInput = document.querySelector('#RestPanel .ConfirmPassword input');
-    
+
     const password = passwordInput.value.trim();
     const confirmPassword = confirmInput.value.trim();
 
@@ -318,9 +414,9 @@ function validatePassword(password, confirmPassword) {
 }
 
 function resetPasswordOnServer(password) {
-    const submitButton = document.querySelector('#RestPanel .SendButton');
+    const submitButton = document.querySelector('#RestPanel .Submit');
     const originalText = submitButton.textContent;
-    
+
     submitButton.textContent = "Updating...";
     submitButton.disabled = true;
 
@@ -331,64 +427,182 @@ function resetPasswordOnServer(password) {
         method: "POST",
         body: formData
     })
-    .then(response => {
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
-        return response.json();
-    })
-    .then(data => {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
+        .then(response => {
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
 
-        if (data.status === "success") {
-            alert("Password reset successfully! Redirecting to login...");
-            setTimeout(() => {
-                window.location.href = "http://localhost:8000/Login/LoginPage.html";
-            }, 1000);
-        } else {
-            alert("Error: " + data.message);
-        }
-    })
-    .catch(error => {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-        alert("An unexpected error occurred. Please try again.");
-        console.error("Password reset error:", error);
-    });
+            if (data.status === "success") {
+                alert("Password reset successfully! Redirecting to login...");
+                setTimeout(() => {
+                    window.location.href = "http://localhost:8000/Login/LoginPage.html";
+                }, 1000);
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+            alert("An unexpected error occurred. Please try again.");
+            console.error("Password reset error:", error);
+        });
 }
 
 function initializeOTPInputs() {
     document.querySelectorAll('.otp-input').forEach((input, index, inputs) => {
-        input.addEventListener('input', function(e) {
+        input.addEventListener('input', function (e) {
             // Only allow numbers and limit to one character
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 1);
-            
+
             // Auto-focus next input
             if (this.value.length === 1 && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
         });
-        
-        input.addEventListener('keydown', function(e) {
+
+        input.addEventListener('keydown', function (e) {
             // Handle backspace
             if (e.key === 'Backspace' && this.value === '' && index > 0) {
                 inputs[index - 1].focus();
             }
-            
+
             // Handle arrow keys
             if (e.key === 'ArrowLeft' && index > 0) {
                 inputs[index - 1].focus();
                 e.preventDefault();
             }
-            
+
             if (e.key === 'ArrowRight' && index < inputs.length - 1) {
                 inputs[index + 1].focus();
                 e.preventDefault();
             }
         });
-        
-        input.addEventListener('paste', function(e) {
+
+        input.addEventListener('paste', function (e) {
             e.preventDefault();
             alert("Please type the OTP digits manually.");
         });
     });
 }
+
+function handlePasswordReset() {
+    const form = document.querySelector(".EmailInputForm");
+    const submitButton = document.querySelector(".Submit");
+    
+    // Try to find error/success message elements, or create them if they don't exist
+    let errorBox = document.querySelector(".error-message");
+    let successBox = document.querySelector(".success-message");
+    
+    // If error/success boxes don't exist, create them
+    if (!errorBox) {
+        errorBox = document.createElement("div");
+        errorBox.className = "error-message";
+        errorBox.style.color = "red";
+        errorBox.style.margin = "10px 0";
+        if (form) {
+            form.parentNode.insertBefore(errorBox, form);
+        }
+    }
+    
+    if (!successBox) {
+        successBox = document.createElement("div");
+        successBox.className = "success-message";
+        successBox.style.color = "green";
+        successBox.style.margin = "10px 0";
+        if (form) {
+            form.parentNode.insertBefore(successBox, form);
+        }
+    }
+
+    // Get fresh values on each click
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirm_password");
+    
+    if (!passwordInput || !confirmPasswordInput) {
+        console.error("Password inputs not found");
+        errorBox.textContent = "Password inputs not found.";
+        return;
+    }
+    
+    const password = passwordInput.value.trim();
+    const confirmPassword = confirmPasswordInput.value.trim();
+
+    console.log("Password:", password); // Debug log
+    console.log("Confirm Password:", confirmPassword); // Debug log
+
+    // Clear previous messages
+    errorBox.textContent = "";
+    successBox.textContent = "";
+
+    // Validation - if any validation fails, return early
+    if (!password || !confirmPassword) {
+        alert("Please fill in both fields.");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    // Additional validation to match PHP requirements
+    if (password.length < 6) {
+        alert("Password must be at least 6 characters long.");
+        return;
+    }
+
+    // Check if password contains both letters and numbers
+    const hasLetter = /[A-Za-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    
+    if (!hasLetter || !hasNumber) {
+        alert("Password must contain both letters and numbers.");
+        return;
+    }
+
+    // If we pass all validations, proceed with the API call
+    const formData = new FormData();
+    formData.append("password", password);
+    formData.append("confirm_password", confirmPassword);
+
+    console.log("All validations passed, preparing API call...");
+
+    // Use async function and call it immediately
+    (async function() {
+        console.log("I have Entered this Section of the code");
+        try {
+            console.log("Sending request to server..."); // Debug log
+            const response = await fetch("RestPassword.php", { 
+                method: "POST", 
+                body: formData 
+            });
+            const result = await response.json();
+            console.log("Server response:", result); // Debug log
+
+            if (result.status === "success") {
+                successBox.textContent = result.message;
+                if (form) form.reset();
+
+                setTimeout(() => {
+                    window.location.href = "http://localhost:8000/Login/LoginPage.html";
+                }, 1000);
+            } else {
+                errorBox.textContent = result.message;
+            }
+        } catch (err) {
+            console.error("Fetch error:", err); // Debug log
+            errorBox.textContent = "Network or server error: " + err.message;
+        }
+    })();
+}
+
+// Add click event listener to the button
+document.querySelector(".Submit").addEventListener("click", function(e) {
+    e.preventDefault();
+    console.log("Button clicked"); // Debug log
+    handlePasswordReset();
+});

@@ -1,13 +1,9 @@
 <?php
-// Set JSON header FIRST - before any output
 header('Content-Type: application/json');
-
-// Prevent any PHP errors from being displayed
 ini_set('display_errors', 0);
 error_reporting(0);
 
-// Your existing include - don't change this
-include '../database.php'; 
+include '../DatabaseConnection.php';
 
 $response = ["status" => "error", "message" => "Unknown error"];
 
@@ -25,53 +21,63 @@ try {
 
     $otp_escaped = $conn->real_escape_string($otp);
 
-    // Your existing database logic here...
-    $pre_check_sql = "SELECT COUNT(*) AS otp_count FROM OTP
-                      WHERE OTPCode = '$otp_escaped' AND status = 'Not Expired'
-                      AND EDT > NOW()";
-    
+    // Check OTP validity
+    $pre_check_sql = "
+        SELECT COUNT(*) AS otp_count 
+        FROM OTP 
+        WHERE OTPCode = '$otp_escaped' 
+          AND status = 'Not Expired'
+          AND EDT > NOW()
+    ";
     $pre_check_result = $conn->query($pre_check_sql);
+
+    if (!$pre_check_result) {
+        throw new Exception("OTP pre-check query failed: " . $conn->error);
+    }
+
     $pre_check_row = $pre_check_result->fetch_assoc();
-    $valid_otp_count = $pre_check_row['otp_count'];
+    $valid_otp_count = $pre_check_row['otp_count'] ?? 0;
 
     if ($valid_otp_count == 0) {
-        $response = ["status" => "failure", "message" => "OTP is invalid or expired", "otp_count" => $valid_otp_count];
-        echo json_encode($response);
+        echo json_encode(["status" => "failure", "message" => "OTP is invalid or expired"]);
         exit;
     }
 
     // Call stored procedure
     if (!$conn->query("CALL OTP_Verification('$otp_escaped', @otp_status)")) {
-        throw new Exception("Procedure call failed");
+        throw new Exception("Stored procedure call failed: " . $conn->error);
     }
 
-    // Clear result sets
-    while ($conn->more_results()) {
-        $conn->next_result();
+    // Clear results to avoid “commands out of sync” errors
+    while ($conn->more_results() && $conn->next_result()) {
         if ($result = $conn->store_result()) {
             $result->free();
         }
     }
 
-    // Get the result from procedure
+    // Get stored procedure result
     $result = $conn->query("SELECT @otp_status AS otp_status");
-    if ($result && $row = $result->fetch_assoc()) {
-        $message = $row['otp_status'];
+    if (!$result) {
+        throw new Exception("Failed to fetch procedure output: " . $conn->error);
     }
 
-    if ($valid_otp_count > 0) {
-        $response = ["status" => "success", "message" => "Verified", "otp_count" => $valid_otp_count];
+    $row = $result->fetch_assoc();
+    $message = $row['otp_status'] ?? "Unknown";
+
+    if ($message === "Verified") {
+        $response = ["status" => "success", "message" => "OTP verified successfully"];
     } else {
-        $response = ["status" => "failure", "message" => "OTP is invalid or expired", "otp_count" => $valid_otp_count];
+        $response = ["status" => "failure", "message" => "OTP verification failed"];
     }
 
     $conn->close();
-
 } catch (Exception $e) {
-    $response = ["status" => "error", "message" => "Verification failed", "otp_count" => $valid_otp_count];
+    $response = [
+        "status" => "error",
+        "message" => $e->getMessage()
+    ];
 }
 
-// FINAL OUTPUT - ONLY JSON, NOTHING ELSE
 echo json_encode($response);
 exit;
 ?>

@@ -110,17 +110,41 @@ CREATE TABLE RegistrationStatus (
 SELECT * FROM OTP;
 CREATE TABLE OTP(
 	OTPCode VARCHAR(4) PRIMARY KEY,
-    EDT DATE,
-    status VARCHAR(15)
+    EDT DATETIME,
+    status VARCHAR(15) DEFAULT('Not Expired')
 );
 
 
 /*
 	 ///////////////////////////////////////
-	///////////Stored Procedures///////////
+	///////   Stored Procedures    ////////
    ///////////////////////////////////////
 */
 
+
+-- Update Password Stored PRocedure 
+DELIMITER $$
+CREATE PROCEDURE Update_password(
+    IN user_email VARCHAR(40),
+    IN new_pass VARCHAR(255)
+)
+BEGIN
+    DECLARE s_id VARCHAR(10);
+    SELECT StudentID INTO s_id FROM Student
+    WHERE Email = user_email LIMIT 1;
+
+    IF s_id IS NOT NULL THEN
+	UPDATE Login
+	SET Password = new_pass
+	WHERE StudentID = s_id;
+        SELECT 'Updated successfully' AS Message;
+    ELSE
+        SELECT 'No student found for this email' AS Message;
+    END IF;
+END$$
+DELIMITER ;
+
+-- Verify Email Stored Procedure
 DELIMITER $$
 CREATE PROCEDURE VerifyEmail(
     IN inputtedEmail VARCHAR(40)
@@ -147,7 +171,7 @@ BEGIN
     END WHILE;
 
     INSERT INTO OTP (OTPCode, EDT, status)
-    VALUES (OTP_Code, NOW() + INTERVAL 1 MINUTE, 'Not Expired');
+    VALUES (OTP_Code, NOW() + INTERVAL 1 MINUTE + INTERVAL 30 SECOND, 'Not Expired');
     SELECT OTP_Code AS OTP;
 END $$
 DELIMITER ;
@@ -157,14 +181,14 @@ DELIMITER ;
 	SET GLOBAL event_scheduler = ON;
 	SHOW VARIABLES LIKE 'event_scheduler';
 	CREATE EVENT IF NOT EXISTS expire_otp_event
-	ON SCHEDULE EVERY 1 MINUTE
+	ON SCHEDULE EVERY 1.5 MINUTE
 	DO
 		UPDATE OTP
 		SET status = 'Expired'
 		WHERE EDT <= NOW()
 		AND status <> 'Expired';
 
-
+DROP EVENT expire_otp_event
 -- Verify OTP Code Stored Procedure
 DELIMITER $$
 CREATE PROCEDURE OTP_Verification(
@@ -179,8 +203,8 @@ BEGIN
 END $$
 DELIMITER;
 
+
 DROP PROCEDURE OTP_Verification
-      
 -- Login Status Procedure
 DELIMITER $$
 CREATE PROCEDURE LoginStats(

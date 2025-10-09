@@ -1,46 +1,66 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-include 'DatabaseConnection.php';
+include '../DatabaseConnection.php';
 
-// Get posted values
+// Retrieve email from session
+$email = $_SESSION['RestUserEmail'] ?? '';
+
 $password = $_POST['password'] ?? '';
-$email = $_SESSION['RestUserEmail'] ?? ''; // Email saved in session earlier
+$confirm_password = $_POST['confirm_password'] ?? '';
 
-if (empty($password) || empty($email)) {
-    echo json_encode(["status" => "error", "message" => "Password or email missing"]);
+// Validation
+if (empty($email)) {
+    echo json_encode(["status" => "error", "message" => "Session expired or email missing. Please restart the reset process."]);
     exit;
 }
 
-// Call stored procedure
-$sql = "CALL Update_password(?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $email, $password);
-
-if ($stmt->execute()) {
-    // Store result set
-    $stmt->store_result();
-
-    // Bind result column (Message returned from procedure)
-    $stmt->bind_result($message);
-
-    if ($stmt->fetch()) {
-        echo json_encode(["status" => "success", "message" => $message]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "No response from procedure"]);
-    }
-
-    // Important: free results to avoid "Commands out of sync" error
-    $stmt->free_result();
-    while ($conn->more_results() && $conn->next_result()) {
-        if ($extraResult = $conn->store_result()) {
-            $extraResult->free();
-        }
-    }
-} else {
-    echo json_encode(["status" => "error", "message" => "Failed to execute procedure"]);
+if (empty($password) || empty($confirm_password)) {
+    echo json_encode(["status" => "error", "message" => "Please enter both password fields."]);
+    exit;
 }
 
-$stmt->close();
-$conn->close();
+if ($password !== $confirm_password) {
+    echo json_encode(["status" => "error", "message" => "Passwords do not match."]);
+    exit;
+}
+
+if (!preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+    echo json_encode(["status" => "error", "message" => "Password must contain both letters and numbers."]);
+    exit;
+}
+
+if (strlen($password) < 6) {
+    echo json_encode(["status" => "error", "message" => "Password must be at least 6 characters long."]);
+    exit;
+}
+
+try {
+    // Prepare the stored procedure
+    $stmt = $conn->prepare("CALL Update_password(?, ?)");
+    $stmt->bind_param("ss", $email, $password);
+
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            $message = $row['Message'] ?? 'No response from procedure';
+            if (strpos(strtolower($message), 'updated') !== false) {
+                echo json_encode(["status" => "success", "message" => $message]);
+            } else {
+                echo json_encode(["status" => "failure", "message" => $message]);
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Unexpected procedure output."]);
+        }
+    } else {
+        echo json_encode(["status" => "error", "message" => "Failed to execute stored procedure."]);
+    }
+
+    $stmt->close();
+    $conn->close();
+
+} catch (Exception $e) {
+    echo json_encode(["status" => "error", "message" => "Server error: " . $e->getMessage()]);
+}
 ?>

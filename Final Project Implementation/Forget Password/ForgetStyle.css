@@ -61,7 +61,7 @@ body{
 }
 
 
-.SendButton{
+.SendButton, .Submit{
     margin-top: 10px;
     padding: 10px 145px 10px 145px;
     border: none;

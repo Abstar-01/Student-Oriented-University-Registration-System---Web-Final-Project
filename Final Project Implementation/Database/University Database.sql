@@ -53,22 +53,16 @@ CREATE TABLE CourseOffered(
     CourseList VARCHAR(255)
 );
 
-
-Select * From CourseTaken;
 CREATE TABLE CourseTaken(
 	StudentID VARCHAR(10),
     CourseCode VARCHAR(10),
     Grade FLOAT,
     Status VARCHAR(10),
+    Season VARCHAR(15),
+    YEAR DATE,
     FOREIGN KEY (CourseCode) REFERENCES Course(CourseCode),
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
-
-Update CourseTaken
-SET Status = 'Failed'
-WHERE StudentID = 'AK8225' AND CourseCode = 'CS211';
-
-
 
 SELECT CourseCode FROM Course WHERE Prerequisite = 'CS322';
 INSERT INTO CourseTaken(StudentID, CourseCode, Status) VALUES
@@ -126,7 +120,7 @@ CREATE TABLE OTP(
 DELIMITER $$
 CREATE PROCEDURE Update_password(
     IN user_email VARCHAR(40),
-    IN new_pass VARCHAR(255)
+    IN new_pass VARCHAR(15)
 )
 BEGIN
     DECLARE s_id VARCHAR(10);
@@ -500,17 +494,19 @@ END$$
 DELIMITER ;
 
 
-
-
-
-
-
-
-
-
-
-
-
+call GetCourseHistory('HB9920');
+-- Getting the course history of a student
+DELIMITER $$
+CREATE PROCEDURE GetCourseHistory(
+    IN p_StudentID VARCHAR(10)
+)
+BEGIN
+    SELECT ct.CourseCode, c.CoursName, c.CreditHours, ct.Grade, ct.Season, ct.Year
+    FROM CourseTaken ct INNER JOIN Course c ON ct.CourseCode = c.CourseCode
+    WHERE ct.StudentID = p_StudentID
+    ORDER BY ct.Year ASC;
+END $$
+DELIMITER ;
 
 
 
@@ -834,3 +830,84 @@ UPDATE Course SET Prerequisite = 'CS497' WHERE CourseCode = 'CS498';
 
 -- Research methods (typically for final year)
 UPDATE Course SET Prerequisite = 'CC234' WHERE CourseCode = 'CS481'; -- Research Methods requires Statistics
+
+
+-- ----------------------------------------------------------------------------------------------------------
+
+
+
+-- Henok Bekele (HB9920) – 4th Year Computer Science
+-- 4th Year (Spring/Winter 2025, Autumn 2024)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2024' WHERE StudentID = 'HB9920' AND CourseCode IN ('CS323', 'CS342', 'CS343');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2025' WHERE StudentID = 'HB9920' AND CourseCode IN ('CS415', 'CS446', 'CS466');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2025' WHERE StudentID = 'HB9920' AND CourseCode IN ('CS467', 'CS468', 'CS469');
+
+-- 3rd Year (Spring/Winter 2024, Autumn 2023)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2023' WHERE StudentID = 'HB9920' AND CourseCode IN ('CC313', 'CC399', 'CS224');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2024' WHERE StudentID = 'HB9920' AND CourseCode IN ('CS301', 'CS302', 'CS321');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2024' WHERE StudentID = 'HB9920' AND CourseCode IN ('CS322', 'CS341', 'CS363', 'CS465');
+
+-- 2nd Year (Spring/Winter 2023, Autumn 2022)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2022' WHERE StudentID = 'HB9920' AND CourseCode IN ('CC214', 'CC215', 'CC216');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2023' WHERE StudentID = 'HB9920' AND CourseCode IN ('CC234', 'CS211', 'CS221');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2023' WHERE StudentID = 'HB9920' AND CourseCode IN ('CS222', 'CS223', 'CS262');
+
+-- 1st Year (Spring/Winter 2022, Autumn 2021)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2021' WHERE StudentID = 'HB9920' AND CourseCode IN ('CC150', 'CC151', 'CC130');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2022' WHERE StudentID = 'HB9920' AND CourseCode IN ('CC140', 'CC112', 'CC113');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2022' WHERE StudentID = 'HB9920' AND CourseCode IN ('CC114', 'CC121', 'CS213', 'CS362', 'CS488', 'CS495', 'CS485');
+
+-- Abel Girma (AK8225) – 3rd Year Computer Science
+-- 3rd Year (Spring/Winter 2025, Autumn 2024)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2024' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS321', 'CS341', 'CS342');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2025' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS343');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2025' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS211', 'CS221', 'CS222', 'CS223', 'CS224');
+
+-- 2nd Year (Spring/Winter 2024, Autumn 2023)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2023' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS211', 'CS221', 'CS222');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2024' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS223', 'CS224', 'CS321');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2024' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS341', 'CS342', 'CS343');
+
+-- 1st Year (Spring/Winter 2023, Autumn 2022)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2022' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS211', 'CS221', 'CS222');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2023' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS223', 'CS224', 'CS321');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2023' WHERE StudentID = 'AK8225' AND CourseCode IN ('CS341', 'CS342', 'CS343');
+
+-- Kalkidan Birhanu (KB1189) – 3rd Year Computer Science
+-- 3rd Year (Spring/Winter 2025, Autumn 2024)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2024' WHERE StudentID = 'KB1189' AND CourseCode IN ('CC313', 'CC399', 'CS224');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2025' WHERE StudentID = 'KB1189' AND CourseCode IN ('CS301', 'CS302', 'CS321');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2025' WHERE StudentID = 'KB1189' AND CourseCode IN ('CS322', 'CS341', 'CS213', 'CS485');
+
+-- 2nd Year (Spring/Winter 2024, Autumn 2023)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2023' WHERE StudentID = 'KB1189' AND CourseCode IN ('CC214', 'CC215', 'CC216');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2024' WHERE StudentID = 'KB1189' AND CourseCode IN ('CC234', 'CS211', 'CS221');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2024' WHERE StudentID = 'KB1189' AND CourseCode IN ('CS222', 'CS223', 'CS262');
+
+-- 1st Year (Spring/Winter 2023, Autumn 2022)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2022' WHERE StudentID = 'KB1189' AND CourseCode IN ('CC150', 'CC151', 'CC130');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2023' WHERE StudentID = 'KB1189' AND CourseCode IN ('CC140', 'CC112', 'CC113');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2023' WHERE StudentID = 'KB1189' AND CourseCode IN ('CC114', 'CC121');
+
+-- Shewit Hailu (SH6351) – 2nd Year Computer Science
+-- 2nd Year (Spring/Winter 2025, Autumn 2024)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2024' WHERE StudentID = 'SH6351' AND CourseCode IN ('CC214', 'CC215', 'CC216');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2025' WHERE StudentID = 'SH6351' AND CourseCode IN ('CC234', 'CS211', 'CS221');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2025' WHERE StudentID = 'SH6351' AND CourseCode IN ('CS222', 'CS223', 'CS213');
+
+-- 1st Year (Spring/Winter 2024, Autumn 2023)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2023' WHERE StudentID = 'SH6351' AND CourseCode IN ('CC150', 'CC151', 'CC130');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2024' WHERE StudentID = 'SH6351' AND CourseCode IN ('CC140', 'CC112', 'CC113');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2024' WHERE StudentID = 'SH6351' AND CourseCode IN ('CC114', 'CC121');
+
+-- Tigist Sisay (TS9143) – 2nd Year Computer Science
+-- 2nd Year (Spring/Winter 2025, Autumn 2024)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2024' WHERE StudentID = 'TS9143' AND CourseCode IN ('CC214', 'CC215', 'CC216');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2025' WHERE StudentID = 'TS9143' AND CourseCode IN ('CC234', 'CS211', 'CS221');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2025' WHERE StudentID = 'TS9143' AND CourseCode IN ('CS222', 'CS223', 'CS213');
+
+-- 1st Year (Spring/Winter 2024, Autumn 2023)
+UPDATE CourseTaken SET Season = 'AUTUMN', YEAR = '2023' WHERE StudentID = 'TS9143' AND CourseCode IN ('CC150', 'CC151', 'CC130');
+UPDATE CourseTaken SET Season = 'SPRING', YEAR = '2024' WHERE StudentID = 'TS9143' AND CourseCode IN ('CC140', 'CC112', 'CC113');
+UPDATE CourseTaken SET Season = 'WINTER', YEAR = '2024' WHERE StudentID = 'TS9143' AND CourseCode IN ('CC114', 'CC121');
+

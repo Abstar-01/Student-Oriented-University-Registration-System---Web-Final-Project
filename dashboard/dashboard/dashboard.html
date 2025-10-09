@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- nav bar -->
+    <div class="nav glass-card">
+      <button class="btn dashboardBtn selected">Dashboard</button>
+      <button class="btn studentsBtn unselected">Students</button>
+      <button class="btn gradesBtn unselected">Grades</button>
+    </div>
+    <!-- Dashboard section -->
+    <section id="dashboard"> 
+      <div class="top-section">
+      <h1>Top-Section Overview <span><i class="fa-regular fa-circle-question"></i></span></h1>
+      <span></span>
+      <div class="cards">
+        <div class="card card1">
+          <h2>Card 1</h2>
+          <p>Information One</p>
+        </div>
+        <div class="card card2">
+          <h2>Card 2</h2>
+          <p>Information 2</p>
+        </div>
+        <div class="card card3">
+          <h2>Card 3</h2>
+          <p>Information 3</p>
+        </div>
+        <div class="card card4">
+          <h2>Card 4</h2>
+          <p>Information 4</p>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-section">
+      <div class="graphs">
+        <div class="graph">
+          <h2>Graph 1</h2>
+          <div class="graph1"></div>
+        </div>
+        <div class="graph">
+          <h2>Graph 2</h2>
+          <div class="graph2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="students">
+    <div class="searchSection">
+      <form class="studentForm" method="post">
+        <label for="search">
+          <input id="search" type="text" placeholder="Student Code...">
+        </label>
+        <button type="submit">
+          <i class="searchBtn fa-solid fa-magnifying-glass"></i>
+        </button>
+      </form>
+      <button class="add"><i class="fa-solid fa-plus"></i></button>
+      
+    </div>
+    <div class="studentsList">
+      <div class="titleRow">
+        <div class="titleData">
+          <p class="fullName">Full Name</p>
+          <p class="dob">BirthDate</p>
+          <p class="gender">Gender</p>
+          <p class="batch">Batch</p>
+          <p class="program">Program</p>
+          <p class="phone">Phone Number</p>
+          <p class="year">Academic Year</p>
+          <p class="email">Email</p>
+        </div>
+      </div>
+      <div class="DataRow">
+        <div class="data">
+          <i class="edit fa-regular fa-pen-to-square"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Modal for adding/updating students -->
+   <div class="popup-overlay ">
+    <div class="modal">
+    <div class="field">
+      <label for="fullName">
+        Full Name <br>
+        <input required id="fullName" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="dob">
+        Birth Date <br>
+        <input required id="dob" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="gender">
+        Gender <br>
+        <input required id="gender" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="batch">
+        Batch <br>
+        <input required id="batch" type="text">
+      </label>
+    </div>
+    <div class="field">
+      Program <br>
+      <label for="program">
+        <input required id="program" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="phone">
+        Phone Number <br>
+        <input required id="phone" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="year">
+        Academic Year <br>
+        <input required id="year" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="email">
+        Email <br>
+        <input required id="email" type="text">
+      </label>
+    </div>
+    <button type="submit" class="addStudentBtn">
+      Add Student
+    </button>
+
+    <button class="removePopup">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+   </div>
+   </div> 
+  <section id="grades">
+      <div class="grade_searchSection">
+      <form class="gradeForm" method="post">
+        <label for="gradeSearch">
+          <input id="gradesearch" type="text" placeholder="Student Code...">
+        </label>
+        <button type="submit">
+          <i class="gradeSearchBtn fa-solid fa-magnifying-glass"></i>
+        </button>
+      </form>
+      <!-- <button class="add"><i class="fa-solid fa-plus"></i></button> -->
+      
+    </div>
+    <div class="gradesList">
+      <div class="titleRow">
+        <div class="titleData">
+          <p class="grade_fullName">Full Name</p>
+          <p class="grade_id">ID</p>
+          <p class="grade_courseCode">Course Code</p>
+          <p class="grade_courseName">Course Name</p>
+          <p class="grade_hours">Credit Hours</p>
+          <p class="grade_letter">Grade</p>
+        </div>
+      </div>
+      <div class="grade_DataRow">
+        <i class="grade_editBtn fa-regular fa-pen-to-square"></i>
+        <div class="grade_data">
+          <p class="grade_fullName">Full Name</p>
+          <p class="grade_id">ID</p>
+          <p class="grade_courseCode">Course Code</p>
+          <p class="grade_courseName">Course Name</p>
+          <p class="grade_hours">Credit Hours</p>
+          <p class="grade_letter">Grade</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Modal for adding/updating students -->
+   <div class="grade_popup-overlay">
+    <div class="grade_modal">
+    <div class="field">
+        <label for="fullName">
+          Full Name <br>
+          <input id="fullName" type="text" readonly>
+        </label>
+    </div>
+    <div class="field">
+      <label for="id">
+        Student Id <br>
+        <input readonly id="id" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="courseCode">
+        Course Code <br>
+        <input readonly id="courseCode" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="courseName">
+        Course Name <br>
+        <input readonly id="courseName" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="creditHours">
+        Credit Hours <br>
+        <input readonly id="creditHours" type="text">
+      </label>
+    </div>
+    <div class="field">
+      <label for="grade">
+        Grade <br>
+        <!-- <input required id="grade" type="text"> -->
+        <select name="grade" id="grade">
+          <option value="0" >N/A</option>
+          <option value="4">A+</option>
+          <option value="4">A</option>
+          <option value="3.5">B+</option>
+          <option value="3">B</option>
+          <option value="2.5">C</option>
+          <option value="2">D</option>
+        </select>
+      </label>
+    </div>
+    <button type="submit" class="addGradeBtn">
+      Add Grade
+    </button>
+
+    <button class="gradeRemovePopup">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    </div>
+
+    </div>
+  <script src="dashboard.js"></script>
+</body>
+</html>

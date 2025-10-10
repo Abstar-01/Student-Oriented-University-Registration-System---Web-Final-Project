@@ -1,3 +1,5 @@
+/* importing notifications */
+@import url('../Toast/style.css');
 body{
     background-image: url(../Images/Login\ Page\ Background\ Texture.png);
 }

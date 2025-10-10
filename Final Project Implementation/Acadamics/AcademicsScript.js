@@ -1,3 +1,60 @@
+// copy the damn code man
+let notifications = document.querySelector('.notifications');
+// console.log(notifications);
+
+// let successbtn = document.querySelector("#success");
+// let failurebtn = document.querySelector("#failure");
+// let infobtn = document.querySelector("#info");
+
+// create functions that each display a success, error, or information notification
+function successToast(message){
+  let icon = "fa-solid fa-circle-check";
+  let type = "success";
+  let title = "Success";
+
+  createToast(type, icon, title, message);
+}
+function failureToast(message){
+  let icon = "fa-solid fa-circle-xmark";
+  let type = "failure";
+  let title = "Failure";
+
+  createToast(type, icon, title, message);
+}
+function infoToast(message){
+  let icon = "fa-solid fa-circle-info";
+  let type = "info";
+  let title = "Info";
+
+  createToast(type, icon, title, message);
+}
+
+function createToast(type, icon, title, message){
+  let toast = document.createElement('div');
+  toast.innerHTML = `
+    <div class="toast ${type}">
+      <i class="${icon}"></i>
+      <div class="content">
+        <div class="title">${title}</div>
+        <span>${message}</span>
+      </div>
+    </div>`;
+    notifications.appendChild(toast);
+    setTimeout(()=>{
+      console.log(toast.firstChild.nextSibling.style.animation = "hide 0.2s ease-in 1 forwards");
+      setTimeout(()=>{
+        notifications.removeChild(toast)
+      }, 400)
+    },3000)
+}
+
+// successbtn.addEventListener('click', () => successToast("Hello my niggas"));
+// failurebtn.addEventListener('click', () => failureToast("Hello my niggas"));
+// infobtn.addEventListener('click', () => infoToast("Hello my niggas"))
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
 document.addEventListener('DOMContentLoaded', () => {
     const courseInfoPanel = document.querySelector('.CourseInformationPanel');
     const courseSearchContent = document.querySelector('.CourseSearchContent');
@@ -112,12 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 createCourseTabs(data.data);
             } else {
                 console.error('❌ Server error:', data.error);
-                alert('Error searching courses: ' + data.error);
+                failureToast('Error searching courses: ' + data.error);
             }
         })
         .catch(error => {
             console.error('❌ Fetch error:', error);
-            alert('Error connecting to server. Check console for details.');
+            failureToast('Error connecting to server. Check console for details.');
         });
     };
 
@@ -127,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (courses.length === 0) {
             console.log('ℹ️ No courses found');
-            alert('No courses found matching your search.');
+            failureToast('No courses found matching your search.');
             // Set minimal height when no results
             setDynamicHeight(0);
             return;
@@ -319,7 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelector("fieldset:nth-of-type(7) input").value = student.Program;
                 document.querySelector("fieldset:nth-of-type(8) input").value = student.AcademicYear;
             } else {
-                alert(data.message);
+                failureToast(data.message);
             }
         })
         .catch(err => console.error("Error fetching student info:", err));

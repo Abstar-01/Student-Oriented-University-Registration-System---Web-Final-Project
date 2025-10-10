@@ -1,3 +1,60 @@
+// copy the damn code man
+let notifications = document.querySelector('.notifications');
+// console.log(notifications);
+
+// let successbtn = document.querySelector("#success");
+// let failurebtn = document.querySelector("#failure");
+// let infobtn = document.querySelector("#info");
+
+// create functions that each display a success, error, or information notification
+function successToast(message){
+  let icon = "fa-solid fa-circle-check";
+  let type = "success";
+  let title = "Success";
+
+  createToast(type, icon, title, message);
+}
+function failureToast(message){
+  let icon = "fa-solid fa-circle-xmark";
+  let type = "failure";
+  let title = "Failure";
+
+  createToast(type, icon, title, message);
+}
+function infoToast(message){
+  let icon = "fa-solid fa-circle-info";
+  let type = "info";
+  let title = "Info";
+
+  createToast(type, icon, title, message);
+}
+
+function createToast(type, icon, title, message){
+  let toast = document.createElement('div');
+  toast.innerHTML = `
+    <div class="toast ${type}">
+      <i class="${icon}"></i>
+      <div class="content">
+        <div class="title">${title}</div>
+        <span>${message}</span>
+      </div>
+    </div>`;
+    notifications.appendChild(toast);
+    setTimeout(()=>{
+      console.log(toast.firstChild.nextSibling.style.animation = "hide 0.2s ease-in 1 forwards");
+      setTimeout(()=>{
+        notifications.removeChild(toast)
+      }, 400)
+    },3000)
+}
+
+// successbtn.addEventListener('click', () => successToast("Hello my niggas"));
+// failurebtn.addEventListener('click', () => failureToast("Hello my niggas"));
+// infobtn.addEventListener('click', () => infoToast("Hello my niggas"))
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
 let timerInterval;
 let otpAttempts = 0;
 const MAX_OTP_ATTEMPTS = 3;
@@ -97,7 +154,7 @@ function handleEmailSubmission() {
     const emailValue = emailInput.value.trim();
 
     if (!validateEmail(emailValue)) {
-        alert("Please enter a valid email address.");
+        infoToast("Please enter a valid email address.");
         emailInput.focus();
         return;
     }
@@ -142,13 +199,13 @@ function verifyEmailWithServer(email) {
             if (data.status === 'success') {
                 showPanel('OTP_Panel');
             } else {
-                alert(data.message || 'Email verification failed.');
+                failureToast(data.message || 'Email verification failed.');
             }
         })
         .catch(error => {
             sendButton.textContent = originalText;
             sendButton.disabled = false;
-            alert('An error occurred. Please try again.');
+            failureToast('An error occurred. Please try again.');
             console.error('Email verification error:', error);
         });
 }
@@ -164,13 +221,13 @@ function handleOTPSubmission() {
     // Validate OTP inputs first
     const validation = validateOTPInputs();
     if (!validation.isValid) {
-        alert(validation.message);
+        failureToast(validation.message);
         return;
     }
 
     // Check attempt limits
     if (otpAttempts >= MAX_OTP_ATTEMPTS) {
-        alert(`Too many failed attempts. Please request a new OTP.`);
+        infoToast(`Too many failed attempts. Please request a new OTP.`);
         disableOTPSubmission();
         return;
     }
@@ -248,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function () {
         successBox.textContent = "";
 
         if (otp.length !== 4 || !/^\d{4}$/.test(otp)) {
-            alert("Please enter a valid 4-digit OTP.");
+            infoToast("Please enter a valid 4-digit OTP.");
             return;
         }
 
@@ -271,22 +328,22 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (result.status === "success") {
-                alert(result.message);
+                successToast(result.message);
                 showPanel('RestPanel');
             } else if (result.status === "failure") {
-                alert(result.message);
+                failureToast(result.message);
             } else {
-                alert(result.message || "An unexpected error occurred.");
+                failureToast(result.message || "An unexpected error occurred.");
             }
         } catch (err) {
-            alert("Network or server error: " + err.message);
+            failureToast("Network or server error: " + err.message);
         }
     });
 
     // Handle Resend OTP click
     resendLink.addEventListener("click", function (e) {
         e.preventDefault();
-        alert("Resending OTP... (implement resend logic)");
+        infoToast("Resending OTP... (implement resend logic)");
     });
 });
 
@@ -333,9 +390,9 @@ function handleResendOTP(e) {
             resetOTPFields();
             startTimer(90);
             enableOTPSubmission();
-            alert(data.message || "New OTP has been sent to your email.");
+            successToast(data.message || "New OTP has been sent to your email.");
         } else {
-            alert(data.message || "Failed to resend OTP. Please try again.");
+            failureToast(data.message || "Failed to resend OTP. Please try again.");
         }
     })
     .catch(error => {
@@ -344,7 +401,7 @@ function handleResendOTP(e) {
         resendLink.textContent = originalText;
         resendLink.style.opacity = "1";
         
-        alert('An error occurred while resending OTP. Please try again.');
+        failureToast('An error occurred while resending OTP. Please try again.');
         console.error('Resend OTP error:', error);
     });
 }
@@ -396,17 +453,17 @@ function handlePasswordReset() {
 
 function validatePassword(password, confirmPassword) {
     if (!password || !confirmPassword) {
-        alert("Password fields cannot be empty.");
+        failureToast("Password fields cannot be empty.");
         return false;
     }
 
     if (password.length < 6) {
-        alert("Password must be at least 6 characters long.");
+        failureToast("Password must be at least 6 characters long.");
         return false;
     }
 
     if (password !== confirmPassword) {
-        alert("Passwords do not match.");
+        failureToast("Passwords do not match.");
         return false;
     }
 
@@ -436,18 +493,18 @@ function resetPasswordOnServer(password) {
             submitButton.disabled = false;
 
             if (data.status === "success") {
-                alert("Password reset successfully! Redirecting to login...");
+                successToast("Password reset successfully! Redirecting to login...");
                 setTimeout(() => {
                     window.location.href = "http://localhost:8000/Login/LoginPage.html";
                 }, 1000);
             } else {
-                alert("Error: " + data.message);
+                failureToast("Error: " + data.message);
             }
         })
         .catch(error => {
             submitButton.textContent = originalText;
             submitButton.disabled = false;
-            alert("An unexpected error occurred. Please try again.");
+            failureToast("An unexpected error occurred. Please try again.");
             console.error("Password reset error:", error);
         });
 }
@@ -484,7 +541,7 @@ function initializeOTPInputs() {
 
         input.addEventListener('paste', function (e) {
             e.preventDefault();
-            alert("Please type the OTP digits manually.");
+            infoToast("Please type the OTP digits manually.");
         });
     });
 }
@@ -540,18 +597,18 @@ function handlePasswordReset() {
 
     // Validation - if any validation fails, return early
     if (!password || !confirmPassword) {
-        alert("Please fill in both fields.");
+        infoToast("Please fill in both fields.");
         return;
     }
 
     if (password !== confirmPassword) {
-        alert("Passwords do not match.");
+        failureToast("Passwords do not match.");
         return;
     }
 
     // Additional validation to match PHP requirements
     if (password.length < 6) {
-        alert("Password must be at least 6 characters long.");
+        failureToast("Password must be at least 6 characters long.");
         return;
     }
 
@@ -560,7 +617,7 @@ function handlePasswordReset() {
     const hasNumber = /[0-9]/.test(password);
     
     if (!hasLetter || !hasNumber) {
-        alert("Password must contain both letters and numbers.");
+        failureToast("Password must contain both letters and numbers.");
         return;
     }
 

@@ -1,3 +1,63 @@
+// copy the damn code man
+let notifications = document.querySelector('.notifications');
+// console.log(notifications);
+
+// let successbtn = document.querySelector("#success");
+// let failurebtn = document.querySelector("#failure");
+// let infobtn = document.querySelector("#info");
+
+// create functions that each display a success, error, or information notification
+function successToast(message){
+  let icon = "fa-solid fa-circle-check";
+  let type = "success";
+  let title = "Success";
+
+  createToast(type, icon, title, message);
+}
+function failureToast(message){
+  let icon = "fa-solid fa-circle-xmark";
+  let type = "failure";
+  let title = "Failure";
+
+  createToast(type, icon, title, message);
+}
+function infoToast(message){
+  let icon = "fa-solid fa-circle-info";
+  let type = "info";
+  let title = "Info";
+
+  createToast(type, icon, title, message);
+}
+
+function createToast(type, icon, title, message){
+  let toast = document.createElement('div');
+  toast.innerHTML = `
+    <div class="toast ${type}">
+      <i class="${icon}"></i>
+      <div class="content">
+        <div class="title">${title}</div>
+        <span>${message}</span>
+      </div>
+    </div>`;
+    notifications.appendChild(toast);
+    setTimeout(()=>{
+      console.log(toast.firstChild.nextSibling.style.animation = "hide 0.2s ease-in 1 forwards");
+      setTimeout(()=>{
+        notifications.removeChild(toast)
+      }, 400)
+    },3000)
+}
+
+// successbtn.addEventListener('click', () => successToast("Hello my niggas"));
+// failurebtn.addEventListener('click', () => failureToast("Hello my niggas"));
+// infobtn.addEventListener('click', () => infoToast("Hello my niggas"))
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 var RegisterationTab = document.getElementById("RegisterIcon");
 var AddIcon = document.getElementById("AddIcon");
 var DropIcon = document.getElementById("DropIcon");
@@ -106,7 +166,7 @@ function checkCreditHourLimit() {
     const currentHours = getCurrentCreditHours();
 
     if (currentHours > maxCreditHours) {
-        alert(`Credit hour limit exceeded! You are allowed maximum ${maxCreditHours} credit hours. Currently selected: ${currentHours} hours.`);
+        // infoToast(`Credit hour limit exceeded! You are allowed maximum ${maxCreditHours} credit hours. Currently selected: ${currentHours} hours.`);
         return false;
     }
     return true;
@@ -143,21 +203,21 @@ function handleCheckboxChange(event) {
 
     if (checkbox.checked) {
         if (remainingCreditHours <= 2) {
-            alert(`Cannot select any more courses! You only have ${remainingCreditHours} credit hours remaining, which is not enough for any course.`);
+            failureToast(`Cannot select any more courses! You only have ${remainingCreditHours} credit hours remaining, which is not enough for any course.`);
             checkbox.checked = false;
             event.preventDefault();
             return;
         }
 
         if (!canSelectCourse(courseHours)) {
-            alert(`Cannot select this course! This course requires ${courseHours} credit hours, but you only have ${remainingCreditHours} credit hours remaining.`);
+            failureToast(`Cannot select this course! This course requires ${courseHours} credit hours, but you only have ${remainingCreditHours} credit hours remaining.`);
             checkbox.checked = false;
             event.preventDefault();
             return;
         }
 
         if (wouldExceedLimit(courseHours)) {
-            alert(`Cannot select this course! Adding ${courseHours} credit hours would exceed your maximum allowed ${maxCreditHours} credit hours.`);
+            failureToast(`Cannot select this course! Adding ${courseHours} credit hours would exceed your maximum allowed ${maxCreditHours} credit hours.`);
             checkbox.checked = false;
             event.preventDefault();
             return;
@@ -195,7 +255,7 @@ function ChooseAll() {
         }
 
         if (potentialTotalHours > maxCreditHours) {
-            alert(`Cannot select all courses! Total credit hours (${potentialTotalHours}) exceeds your maximum allowed (${maxCreditHours}) based on your GPA.`);
+            failureToast(`Cannot select all courses! Total credit hours (${potentialTotalHours}) exceeds your maximum allowed (${maxCreditHours}) based on your GPA.`);
             MainSelector.checked = false;
             return;
         }
@@ -318,6 +378,118 @@ AddIcon.addEventListener("click", displayWithStudentInfo);
 DropIcon.removeEventListener("click", display);
 DropIcon.addEventListener("click", displayWithStudentInfo);
 
+//////////////////////////////////////////////////////////////////////////////
+//////         Registration Check
+
+// Check registration status and decide which panel to show
+function checkRegistrationStatus() {
+    fetch('CheckRegistration.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                if (data.registered) {
+                    // Student is registered, show the receipt
+                    displayReceipt(data.data);
+                    return true;
+                } else {
+                    // Student is not registered, show the registration form
+                    panel2.style.display = "block";
+                    loadStudentInformation(); // Call your existing function
+                    loadRegistrationCourses(); // Call your existing function
+                }
+            } else {
+                console.error('Error checking registration status:', data.message);
+                failureToast('Error: ' + data.message);
+                panel1.style.display = "block"; // Fallback to base display
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching registration status:', error);
+            failureToast('Error loading registration status. Please try again.');
+            panel1.style.display = "block"; // Fallback to base display
+        });
+        return false;
+}
+
+// Display the registration receipt and populate it with data
+function displayReceipt(data) {
+    FinacialRecietPage.style.display = "block";
+    FinacialRecietPage.style.opacity = "0";
+    FinacialRecietPage.style.transition = "opacity 0.5s";
+    setTimeout(() => {
+        FinacialRecietPage.style.opacity = "1";
+    }, 50);
+
+    // Populate student information (same as before)
+    const studentInputs = document.querySelectorAll('.StudentInformation input[type="text"]');
+    if (studentInputs.length >= 6) {
+        studentInputs[0].value = data.FullName || 'N/A';
+        studentInputs[1].value = data.StudentID || 'N/A';
+        studentInputs[2].value = data.Program || 'N/A';
+        studentInputs[3].value = data.Batch || 'N/A';
+        studentInputs[4].value = data.PhoneNumber || 'N/A';
+        studentInputs[5].value = data.AcademicYear || 'N/A';
+    }
+
+    // Populate course information with complete details from CSV
+    const courseTable = document.querySelector('.CoursesTaken table');
+    // Clear existing content and add headers
+    courseTable.innerHTML = `
+        <tr>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Course Fee</th>
+        </tr>
+    `;
+
+    if (data.Courses && data.Courses.length > 0) {
+        data.Courses.forEach(course => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${course.CourseCode || 'N/A'}</td>
+                <td>${course.CourseName || 'N/A'}</td>
+                <td>${course.CourseFee || '0.00'}</td>
+            `;
+            courseTable.appendChild(row);
+        });
+
+        // Add total row
+        const totalRow = document.createElement('tr');
+        totalRow.style.fontWeight = 'bold';
+        totalRow.style.backgroundColor = '#f0f0f0';
+        totalRow.innerHTML = `
+            <td colspan="2">Total Amount</td>
+            <td>${data.TotalAmount}</td>
+        `;
+        courseTable.appendChild(totalRow);
+    } else {
+        // No courses message
+        const noCoursesRow = document.createElement('tr');
+        noCoursesRow.innerHTML = `
+            <td colspan="3" style="text-align: center; padding: 20px; color: #666;">
+                No courses registered
+            </td>
+        `;
+        courseTable.appendChild(noCoursesRow);
+    }
+
+    // Populate transaction information (same as before)
+    document.querySelector('.RRID').textContent = data.RegistrationID || 'N/A';
+    document.querySelector('.TID').textContent = data.TransactionID || 'N/A';
+    document.querySelector('.A_Number').textContent = data.BankAccountNumber || 'N/A';
+    document.querySelector('.BankName').textContent = data.BankName || 'N/A';
+    document.querySelector('.AmPayed').textContent = data.TransactionAmount || '0.00';
+    document.querySelector('.DAP').textContent = data.RegistrationDate || 'N/A';
+
+    // Call your existing function to update the registration header
+    
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////
 ////          Course Registration Panel Information Retrival
@@ -341,10 +513,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (!data.success) {
                     registrationPanel.style.display = "none";
-                    alert(data.message);
+                    failureToast(data.message);
                     return;
                 }
-
                 registrationPanel.style.display = "block";
                 const existingRows = courseTable.querySelectorAll("tr:not(.Header)");
                 existingRows.forEach(row => row.remove());
@@ -374,7 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(err => {
                 console.error('Error:', err);
                 registrationPanel.style.display = "none";
-                alert("Error loading courses: " + err.message);
+                failureToast("Error loading courses: " + err.message);
             });
     });
 
@@ -397,7 +568,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 clearInterval(registrationTimer);
                 registrationPanel.style.display = "none";
                 registerIcon.style.pointerEvents = "none";
-                alert("Course registration time has expired!");
+                failureToast("Course registration time has expired!");
             }
         }, 1000);
     }
@@ -590,16 +761,16 @@ function AllFilledIn() {
 
         if (input.type === "file") {
             if (input.files.length === 0) {
-                alert("Please upload your receipt.");
+                infoToast("Please upload your receipt.");
                 return false;
             }
         } else if (input.tagName === "SELECT") {
             if (input.selectedIndex === 0 || input.value.trim() === "") {
-                alert("Please select a banking type.");
+                infoToast("Please select a banking type.");
                 return false;
             }
         } else if (input.value.trim() === "") {
-            alert("Please fill out all required fields.");
+            infoToast("Please fill out all required fields.");
             return false;
         }
     }
@@ -716,14 +887,14 @@ function sendRegistrationData(registrationData) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('✅ ' + data.message);
+                successToast('✅ ' + data.message);
             } else {
-                alert('❌ ' + data.message);
+                failureToast('❌ ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('❌ An error occurred while processing your registration.');
+            failureToast('❌ An error occurred while processing your registration.');
         });
 }
 
@@ -776,7 +947,7 @@ async function checkPrerequisites() {
     const selectedCourses = getSelectedCourses();
 
     if (selectedCourses.length === 0) {
-        alert('Please select at least one course before submitting.');
+        failureToast('Please select at least one course before submitting.');
         return false;
     }
 
@@ -803,12 +974,12 @@ async function checkPrerequisites() {
                 return true;
             }
         } else {
-            alert('Error checking prerequisites: ' + data.message);
+            failureToast('Error checking prerequisites: ' + data.message);
             return false;
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Unable to check prerequisites. Please try again.');
+        failureToast('Unable to check prerequisites. Please try again.');
         return false;
     }
 }
@@ -828,7 +999,7 @@ function handlePrerequisiteIssues(prerequisiteResults) {
 
     if (hasIssues) {
         alertMessage += "The courses with incomplete prerequisites have been dimmed and made inaccessible. Please review your selection.";
-        alert(alertMessage);
+        failureToast(alertMessage);
         dimProblematicCourses(coursesWithIssues);
     }
 }
@@ -896,7 +1067,7 @@ async function SubmitSelection(event) {
     let hasCheckedCourses = Array.from(checkboxes).some(cb => cb.checked && !cb.disabled);
 
     if (!hasCheckedCourses) {
-        alert('Please select at least one course.');
+        infoToast('Please select at least one course.');
         return false;
     }
 
@@ -987,7 +1158,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (!data.success) {
                     addPanel.style.display = "none";
-                    alert(data.message);
+                    failureToast(data.message);
                     return;
                 }
 
@@ -1050,7 +1221,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(err => {
                 console.error('Error:', err);
                 addPanel.style.display = "none";
-                alert("Error loading available courses: " + err.message);
+                failureToast("Error loading available courses: " + err.message);
             });
     });
 
@@ -1109,7 +1280,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const checkboxes = addCourseTable.querySelectorAll('input[type="checkbox"]:checked');
 
         if (checkboxes.length === 0) {
-            alert('Please select at least one course to add.');
+            failureToast('Please select at least one course to add.');
             return;
         }
 
@@ -1140,17 +1311,17 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Add request submitted successfully!');
+                    successToast('Add request submitted successfully!');
                     // Optionally refresh the course list or reset the form
                     addPanel.style.display = 'none';
                     document.querySelector(".BaseDisplay").style.display = 'block';
                 } else {
-                    alert('Error submitting add request: ' + data.message);
+                    failureToast('Error submitting add request: ' + data.message);
                 }
             })
             .catch(err => {
                 console.error('Submission error:', err);
-                alert('Error submitting add request. Please try again.');
+                failureToast('Error submitting add request. Please try again.');
             });
     }
 
